@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Training Card Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0f2942; --navy-2:#1c4269; --navy-deep:#081826;
+    --amber:#f2a53d; --amber-dark:#c17f1c; --amber-light:#fdf1de;
+    --bg:#eef1f6; --card-bg:#fff;
+    --border:#dde3ec; --border-soft:#e9edf3;
+    --text:#1c2531; --muted:#67748a;
+    --danger:#d6483f; --danger-dark:#ad3830; --danger-light:#fbe6e4;
+    --success:#1f8a4c; --success-dark:#166638; --success-light:#e1f4e9;
+    --font-display:'Oswald',"Segoe UI",Arial,sans-serif;
+    --font-body:'Inter',"Segoe UI",Arial,sans-serif;
+    --stripe:repeating-linear-gradient(45deg,var(--amber) 0 12px,var(--navy-2) 12px 24px);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+  body::before{content:'';display:block;height:5px;background:var(--stripe);}
+  ::selection{background:var(--amber-light);color:var(--navy-deep);}
+  ::-webkit-scrollbar{width:10px;height:10px;} ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:#c3ccd9;border-radius:10px;} ::-webkit-scrollbar-thumb:hover{background:#a9b4c4;}
+
+  header{background:linear-gradient(135deg,var(--navy),var(--navy-deep));color:#fff;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:0 2px 10px rgba(8,24,38,.25);position:relative;z-index:60;}
+  header .brand{display:flex;align-items:center;gap:12px;}
+  header .brand-icon{width:38px;height:38px;border-radius:9px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  header h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:.3px;text-transform:uppercase;}
+  header .sub{font-size:12px;opacity:.75;margin-top:1px;}
+  header #workerCountTxt{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.2px;}
+
+  nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 26px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(15,41,66,.03);}
+  nav button{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:9px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s ease;}
+  nav button:hover{background:var(--amber-light);border-color:var(--amber);color:var(--amber-dark);}
+  nav button.active{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(15,41,66,.3);}
+
+  main{padding:22px 26px 60px;max-width:1150px;margin:0 auto;}
+  .panel{display:none;} .panel.active{display:block;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(15,41,66,.04),0 8px 20px -12px rgba(15,41,66,.12);}
+  .card h2{margin-top:0;font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:.3px;text-transform:uppercase;color:var(--navy);border-bottom:2px solid var(--border-soft);padding-bottom:10px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;} @media(max-width:680px){.grid2{grid-template-columns:1fr;}}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;} @media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr);}} @media(max-width:520px){.grid4{grid-template-columns:1fr;}}
+
+  label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px;}
+  input[type=text],input[type=date],select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font-body);background:#fff;color:var(--text);transition:.15s ease;}
+  input[type=text]:focus,input[type=date]:focus,select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(242,165,61,.22);}
+  .field{margin-bottom:13px;}
+  .sign-toggle{display:inline-flex;align-items:center;justify-content:center;width:56px;height:30px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;user-select:none;background:#fff;color:var(--success-dark);border:1.5px solid var(--border);transition:.15s ease;}
+  .sign-toggle:hover{border-color:var(--amber);background:var(--amber-light);}
+  .sign-toggle.is-done{background:var(--success-light);border-color:var(--success);}
+  .sign-toggle.readonly{cursor:default;}
+  .sign-toggle.readonly:hover{border-color:var(--border);background:#fff;}
+  .sign-toggle.readonly.is-done:hover{background:var(--success-light);border-color:var(--success);}
+
+  .photo-box{width:120px;height:120px;border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;overflow:hidden;background:var(--bg);margin-bottom:10px;transition:.15s ease;}
+  .photo-box:hover{border-color:var(--amber);color:var(--amber-dark);background:var(--amber-light);}
+  .photo-box img{width:100%;height:100%;object-fit:cover;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{border:1px solid var(--border-soft);padding:8px 9px;text-align:left;vertical-align:middle;}
+  thead th{background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+  tbody tr:nth-child(even){background:#f7f9fb;} tbody tr:hover{background:var(--amber-light);}
+  .hindi{font-size:11px;color:var(--muted);display:block;}
+
+  .btn{border:none;padding:9px 17px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--font-body);cursor:pointer;transition:.15s ease;box-shadow:0 1px 2px rgba(15,41,66,.08);}
+  .btn:hover{transform:translateY(-1px);} .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--navy);color:#fff;} .btn-primary:hover{background:var(--navy-2);box-shadow:0 4px 10px rgba(15,41,66,.3);}
+  .btn-success{background:var(--success);color:#fff;} .btn-success:hover{background:var(--success-dark);box-shadow:0 4px 10px rgba(31,138,76,.3);}
+  .btn-danger{background:var(--danger);color:#fff;} .btn-danger:hover{background:var(--danger-dark);box-shadow:0 4px 10px rgba(214,72,63,.3);}
+  .btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--border);} .btn-outline:hover{background:var(--amber-light);border-color:var(--amber);color:var(--amber-dark);}
+  .btn-sm{padding:6px 12px;font-size:12px;}
+
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+  .search-box{flex:1;min-width:220px;}
+  .adv-search{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+  .adv-search h3{margin:0 0 10px;font-family:var(--font-display);font-size:13px;text-transform:uppercase;letter-spacing:.3px;color:var(--navy);}
+  .empty-state{text-align:center;color:var(--muted);padding:44px 10px;font-size:14px;}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .badge-complete{background:var(--success-light);color:var(--success-dark);}
+  .badge-partial{background:var(--amber-light);color:var(--amber-dark);}
+  .badge-none{background:var(--danger-light);color:var(--danger-dark);}
+  .module-table th:nth-child(1){width:36px;} .module-table th:nth-child(2){width:30%;}
+
+  #toast{position:fixed;bottom:24px;right:24px;background:var(--navy-deep);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:.25s;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.25);border-left:4px solid var(--amber);}
+  #toast.show{opacity:1;transform:translateY(0);}
+
+  .form-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:-6px;margin-bottom:14px;line-height:1.5;}
+
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .stat{background:#fff;border:1px solid var(--border);border-left:4px solid var(--navy);border-radius:10px;padding:9px 16px;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.2px;box-shadow:0 1px 2px rgba(15,41,66,.04);}
+  .stat b{font-family:var(--font-display);color:var(--navy);font-size:19px;font-weight:600;display:block;text-transform:none;letter-spacing:0;margin-bottom:1px;}
+
+   /* ---------- PRINT: SAFETY TRAINING CARD ---------- */
+   @page{size:A4 portrait;margin:6mm;}
+   #printArea{width:198mm;padding:0;margin:0;font-family:var(--font-body);}
+   @media print{
+     body::before{display:none!important;}
+     html,body{width:210mm;margin:0;padding:0;}
+     body *{visibility:hidden;} #printArea, #printArea *{visibility:visible;}
+     #printArea{position:absolute;top:0;left:0;}
+     header,nav,#toast{display:none!important;}
+     .pt-modules tr{page-break-inside:avoid;}
+     .pt-modules{page-break-inside:avoid;}
+     #printArea{page-break-after:avoid;page-break-inside:avoid;}
+     .pt-card-page{page-break-after:always;page-break-inside:avoid;}
+     .pt-card-page:last-child{page-break-after:auto;}
+   }
+
+   .pt-card{border:1.5px solid var(--navy);border-radius:12px;overflow:hidden;background:#fff;}
+   .pt-stripe{height:5px;background:var(--stripe);}
+   .pt-header{background:linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;padding:12px 18px;display:flex;align-items:center;gap:13px;}
+   .pt-header-icon{width:36px;height:36px;border-radius:9px;background:var(--amber);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;}
+   .pt-title{font-family:var(--font-display);font-weight:600;font-size:21px;letter-spacing:.7px;text-transform:uppercase;margin:0;}
+   .pt-subtitle{font-size:11px;letter-spacing:.3px;opacity:.85;margin-top:2px;}
+
+   .pt-info-wrap{display:flex;gap:16px;padding:13px 18px;border-bottom:1.5px solid var(--navy);align-items:center;}
+   .pt-photo-col{flex:0 0 104px;width:104px;}
+   .pt-photo-col img{width:104px;height:122px;object-fit:cover;border-radius:9px;border:1.5px solid var(--navy);display:none;}
+   .pt-photo-placeholder{width:104px;height:122px;border-radius:9px;border:1.5px dashed #b7c0cd;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#9aa7b6;text-align:center;padding:4px;line-height:1.3;}
+   .pt-info-grid{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;}
+   .pt-field-name .pt-value{font-size:18.5px;}
+   .pt-field-row{display:flex;gap:24px;}
+   .pt-field{flex:1;min-width:0;}
+   .pt-label{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;}
+   .pt-value{display:block;font-size:14px;font-weight:700;color:var(--text);margin-top:2px;font-family:var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+   .pt-modules{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed;}
+   .pt-modules th,.pt-modules td{border:1px solid #c7d0dc;padding:4.5px 6px;word-wrap:break-word;line-height:1.22;}
+   .pt-modules thead th{background:var(--navy);color:#fff;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;padding:7px 6px;}
+   .pt-modules tbody tr:nth-child(even){background:#f4f7fa;}
+   .pt-modules th:nth-child(1),.pt-modules td:nth-child(1){width:28px;text-align:center;color:var(--navy);font-weight:700;}
+   .pt-modules th:nth-child(2),.pt-modules td:nth-child(2){width:31%;}
+   .pt-modules th:nth-child(3),.pt-modules td:nth-child(3){width:14%;height:22px;}
+   .pt-modules th:nth-child(4),.pt-modules td:nth-child(4){width:18%;height:22px;}
+   .pt-modules th:nth-child(5),.pt-modules td:nth-child(5){width:14%;height:22px;text-align:center;}
+   .pt-modules th:nth-child(6),.pt-modules td:nth-child(6){width:14%;height:22px;text-align:center;}
+  .pt-hide-print{}
+  @media print{ .pt-hide-print{display:none!important;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🦺</div>
+    <div>
+      <h1>Safety Training Card Manager</h1>
+      <div class="sub">Worker Safety Training Records System</div>
+    </div>
+  </div>
+  <div id="workerCountTxt">0 workers</div>
+</header>
+
+<nav>
+  <button data-panel="panelDashboard" class="nav-btn active">🏠 Dashboard</button>
+  <button data-panel="panelList" class="nav-btn">📋 View / Search</button>
+  <button data-panel="panelNew" class="nav-btn">➕ New Worker</button>
+  <input type="file" id="importFile" accept="application/json" style="display:none">
+  <button data-panel="panelSync" class="nav-btn" id="syncNavBtn" style="display:none">☁ Cloud Sync</button>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panelDashboard">
+    <div class="card">
+      <h2>Dashboard</h2>
+      <div class="stats" id="dashStats"></div>
+    </div>
+    <div class="card">
+      <h2>Folders</h2>
+      <div class="hint">Each folder keeps its own set of saved worker training cards. Click a folder to view its workers.</div>
+      <div class="grid2" id="folderCards"></div>
+    </div>
+  </div>
+
+  <!-- LIST / SEARCH -->
+  <div class="panel" id="panelList">
+    <div class="card">
+      <h2>Worker List</h2>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="🔍 Quick search across all fields...">
+        </div>
+        <select id="filterFolder">
+          <option value="">All Folders</option>
+        </select>
+        <select id="filterStatus">
+          <option value="">All Status</option>
+          <option value="complete">Complete (25/25)</option>
+          <option value="partial">Partial</option>
+          <option value="none">Not Started</option>
+        </select>
+        <button class="btn btn-outline btn-sm" id="toggleAdv">⚙ Advanced Search</button>
+        <button class="btn btn-outline btn-sm" id="clearSearch">✖ Clear</button>
+      </div>
+
+      <div class="adv-search" id="advSearch" style="display:none">
+        <h3>Advanced Search</h3>
+        <div class="grid4">
+          <div><label>Folder</label>
+            <select id="advFolder"><option value="">Any</option></select>
+          </div>
+          <div><label>Name</label><input type="text" id="advName"></div>
+          <div><label>CLIMS ID</label><input type="text" id="advClims"></div>
+          <div><label>Grade</label><input type="text" id="advGrade"></div>
+          <div><label>Agency</label><input type="text" id="advAgency"></div>
+          <div><label>Work Area</label><input type="text" id="advArea"></div>
+          <div><label>Trainer Name</label><input type="text" id="advTrainer"></div>
+          <div><label>Training Module</label>
+            <select id="advModule"><option value="">Any</option></select>
+          </div>
+          <div><label>Training Date From</label><input type="date" id="advDateFrom"></div>
+          <div><label>Training Date To</label><input type="date" id="advDateTo"></div>
+          <div><label>Min Completed Modules</label><input type="text" id="advMinDone" placeholder="0-25"></div>
+          <div><label>Has Photo</label>
+            <select id="advPhoto"><option value="">Any</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div><label>Sort By</label>
+            <select id="advSort">
+              <option value="name">Name (A-Z)</option>
+              <option value="name_desc">Name (Z-A)</option>
+              <option value="clims">CLIMS ID</option>
+              <option value="progress_desc">Progress (High-Low)</option>
+              <option value="progress_asc">Progress (Low-High)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <table id="workerTable">
+        <thead>
+          <tr>
+            <th>Photo</th><th>Name</th><th>CLIMS ID</th>
+            <th>Folder</th><th>Grade</th><th>Agency</th><th>Work Area</th><th>Training Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="workerTableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState">No workers added yet. Click "New Worker" to add your first training card.</div>
+    </div>
+  </div>
+
+  <!-- NEW / EDIT -->
+  <div class="panel" id="panelNew">
+    <div class="card">
+      <h2 id="formTitle">New Worker Training Card</h2>
+      <input type="hidden" id="workerId">
+      <div class="grid2">
+        <div>
+          <div class="field"><label>Folder *</label>
+            <select id="fFolder">
+              <option value="EMD Lighting">EMD Lighting</option>
+              <option value="EMD Cable">EMD Cable</option>
+            </select>
+          </div>
+          <div class="field"><label>Name of Worker *</label><input type="text" id="fName"></div>
+          <div class="field"><label>CLIMS ID *</label><input type="text" id="fClims"></div>
+          <div class="field"><label>Grade</label><input type="text" id="fGrade"></div>
+          <div class="field"><label>Name of Agency</label><input type="text" id="fAgency"></div>
+          <div class="field"><label>Work Area</label><input type="text" id="fArea"></div>
+        </div>
+        <div>
+          <label>Worker Photo</label>
+          <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">📷 Click to Add Worker Photo</div>
+          <input type="file" id="photoInput" accept="image/*" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Training Modules</h2>
+      <div class="hint">Fill date, trainer name and click the sign box to mark it signed (✔) for each completed module.</div>
+      <table class="module-table">
+        <thead><tr><th>S.N</th><th>Training Module</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th></tr></thead>
+        <tbody id="moduleTableBody"></tbody>
+      </table>
+      <div class="form-actions">
+        <button class="btn btn-success" id="saveWorkerBtn">💾 Save Card</button>
+        <button class="btn btn-success" id="printFromFormBtn" style="display:none">🖨 Print Card</button>
+        <button class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOUD SYNC SETTINGS -->
+  <div class="panel" id="panelSync">
+    <div class="card">
+      <h2>Cloud Sync Settings</h2>
+      <div class="hint">
+        Paste your Google Apps Script Web App URL here and click "Save URL". After that, every new/edited worker card will automatically save to Google Sheet and Google Drive (photo) as well — data on this website (this browser) will remain the same.
+      </div>
+      <div class="field">
+        <label>Google Apps Script Web App URL</label>
+        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/XXXXXXXXXXXX/exec">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" id="saveGasUrlBtn">💾 Save URL</button>
+        <button class="btn btn-primary" id="testGasBtn">🔌 Test Connection</button>
+        <button class="btn btn-outline" id="pullNowBtn">⬇ Pull from Sheet</button>
+        <button class="btn btn-outline" id="pushAllBtn">⬆ Push All to Cloud</button>
+        <button class="btn btn-danger" id="clearGasUrlBtn">✖ Disconnect</button>
+      </div>
+      <div id="gasStatus" style="margin-top:12px;font-size:13px;"></div>
+    </div>
+    <div class="card">
+      <h2>How it works</h2>
+      <div class="hint" style="margin-bottom:0;">
+        1. When you Save a Card, data is instantly saved in this browser (localStorage), and also sent to Google Sheet + Drive (if URL is connected).<br>
+        2. Clicking "Pull from Sheet" fetches records present in the Sheet into this website (workers added from other devices/browsers will also appear).<br>
+        3. If there is no internet or cloud sync fails, your data remains safe in this browser — no data loss.<br>
+        4. Steps for setting up the Apps Script (Code.gs) file are provided in chat.
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="printArea" style="display:none;">
+  <div class="pt-card">
+    <div class="pt-stripe"></div>
+    <div class="pt-header">
+      <div class="pt-header-icon">🦺</div>
+      <div>
+        <p class="pt-title">Safety Training Card</p>
+        <div class="pt-subtitle pt-hide-print">Worker Safety Training Record &nbsp;•&nbsp; <span id="pFolder"></span></div>
+      </div>
+    </div>
+    <div class="pt-info-wrap">
+      <div class="pt-photo-col">
+        <img id="pPhoto" src="" alt="Worker photo">
+        <div class="pt-photo-placeholder" id="pPhotoPlaceholder">Worker Photo</div>
+      </div>
+      <div class="pt-info-grid">
+        <div class="pt-field pt-field-name">
+          <span class="pt-label">Name of Worker</span>
+          <span class="pt-value" id="pName"></span>
+        </div>
+        <div class="pt-field-row">
+          <div class="pt-field"><span class="pt-label">CLIMS ID</span><span class="pt-value" id="pClims"></span></div>
+          <div class="pt-field"><span class="pt-label">Grade</span><span class="pt-value" id="pGrade"></span></div>
+        </div>
+        <div class="pt-field-row">
+          <div class="pt-field"><span class="pt-label">Name of Agency</span><span class="pt-value" id="pAgency"></span></div>
+          <div class="pt-field"><span class="pt-label">Work Area</span><span class="pt-value" id="pArea"></span></div>
+        </div>
+      </div>
+    </div>
+    <table class="pt-modules">
+      <thead><tr><th>S.N</th><th>Training Module Name</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th></tr></thead>
+      <tbody id="pModules"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const MODULES = [
+"Induction Training / प्रारंभिक प्रशिक्षण","Use of PPE / पीपीई का उपयोग","Fire Safety / आग से सुरक्षा",
+"Electrical Safety / विद्युत से सुरक्षा","Work at Height / ऊंचाई पर कार्य","Basics of PTW System / PTW की मूल प्रणाली",
+"Manual Handling / मैनुअल हैंडलिंग","Hand Tools / हाथों से चलने वाले उपकरण","Slips-Trips Falls / फिसलना-ठोकर-गिरना",
+"General Safety Including Hygiene / सफाई सहित सामान्य सुरक्षा","Caught-By/Caught-in / उपकरणों में फंसना या उनमें फँसना",
+"Road Safety / सड़क सुरक्षा","Material Handling / सामग्री हैंडलिंग","Safety & Hygiene of Office / कार्यालय की सुरक्षा और स्वच्छता",
+"Hazardous Chemicals / खतरनाक रसायन से सुरक्षा","Work Near Water / पानी के पास कार्य","Heavy Vehicle Safety / भारी वाहन सुरक्षा",
+"First Aid / प्राथमिक उपचार","Struck by, Run Over Hazards / खतरों से भागकर मारा जाना","Basics of Ergonomics / एर्गोनॉमिक्स की मूल बातें",
+"Caught-by/in/-in between Hazards / खतरों के बीच में फंसना","Power Tools / पॉवर उपकरण","Hot Work / गर्म कार्य पर कार्य करना",
+"Work in Confined Spaces / सीमित स्थानों में कार्य करना","Basics of Safety Rules & PTW System / सुरक्षा नियमों की मूल बातें और पीटीडब्ल्यू प्रणाली"
+];
+const STORAGE_KEY = "safety_training_cards_v1";
+const FOLDERS = ["EMD Lighting","EMD Cable"];
+let activeFolder = '';
+let workers = []; let editingId = null; let currentPhotoData = '';
+
+function uid(){return 'w_'+Date.now()+'_'+Math.floor(Math.random()*10000);}
+function blankTrainings(){return MODULES.map(()=>({date:'',trainer:'',trainerSign:false,workerSign:false}));}
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(workers));}catch(e){}}
+function load(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)workers=JSON.parse(r);}catch(e){}}
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// Populate module dropdown
+const advModuleSel = document.getElementById('advModule');
+MODULES.forEach((m,i)=>{const o=document.createElement('option');o.value=String(i);const idx=m.lastIndexOf('/');const label=idx!==-1?m.substring(0,idx).trim():m.trim();o.textContent=(i+1)+'. '+label;advModuleSel.appendChild(o);});
+
+const advFolderSel = document.getElementById('advFolder');
+const filterFolderSel = document.getElementById('filterFolder');
+FOLDERS.forEach(f=>{
+  const o1=document.createElement('option');o1.value=f;o1.textContent=f;advFolderSel.appendChild(o1);
+  const o2=document.createElement('option');o2.value=f;o2.textContent=f;filterFolderSel.appendChild(o2);
+});
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(btn.dataset.panel).classList.add('active');
+    if(btn.dataset.panel==='panelNew')resetForm();
+    if(btn.dataset.panel==='panelList')renderTable();
+    if(btn.dataset.panel==='panelDashboard')renderDashboard();
+  });
+});
+function goTo(id){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));const n=document.querySelector(`.nav-btn[data-panel="${id}"]`);if(n)n.classList.add('active');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function buildModuleRows(trainings){
+  const tb=document.getElementById('moduleTableBody');tb.innerHTML='';
+  MODULES.forEach((m,i)=>{
+    const t=trainings[i]||{date:'',trainer:'',trainerSign:false,workerSign:false};
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${m}</td>
+      <td><input type="date" class="mDate" value="${t.date}"></td>
+      <td><input type="text" class="mTrainer" value="${escapeHtml(t.trainer)}" placeholder="Trainer name"></td>
+      <td style="text-align:center"><span class="sign-toggle ${t.trainerSign?'is-done':''}" data-role="trainer" data-signed="${t.trainerSign?'1':'0'}">${t.trainerSign?'✔':''}</span></td>
+      <td style="text-align:center"><span class="sign-toggle ${t.workerSign?'is-done':''}" data-role="worker" data-signed="${t.workerSign?'1':'0'}">${t.workerSign?'✔':''}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+document.getElementById('moduleTableBody').addEventListener('click',e=>{
+  const el=e.target.closest('.sign-toggle');
+  if(!el||el.classList.contains('readonly'))return;
+  const signed=el.dataset.signed==='1';
+  el.dataset.signed=signed?'0':'1';
+  el.textContent=signed?'':'✔';
+  el.classList.toggle('is-done',!signed);
+});
+function collectTrainings(){
+  const d=document.querySelectorAll('.mDate'),tr=document.querySelectorAll('.mTrainer'),
+        ts=document.querySelectorAll('.sign-toggle[data-role="trainer"]'),ws=document.querySelectorAll('.sign-toggle[data-role="worker"]');
+  const r=[];for(let i=0;i<MODULES.length;i++)r.push({date:d[i].value,trainer:tr[i].value,trainerSign:ts[i].dataset.signed==='1',workerSign:ws[i].dataset.signed==='1'});
+  return r;
+}
+document.getElementById('photoInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=ev=>{currentPhotoData=ev.target.result;document.getElementById('photoBox').innerHTML=`<img src="${currentPhotoData}">`;};
+  r.readAsDataURL(f);
+});
+function setFormReadOnly(ro){
+  document.querySelectorAll('#panelNew input, #panelNew select').forEach(el=>{el.disabled=ro;});
+  document.getElementById('saveWorkerBtn').style.display=ro?'none':'inline-block';
+  document.getElementById('photoBox').style.pointerEvents=ro?'none':'auto';
+  document.getElementById('photoBox').style.opacity=ro?'0.7':'1';
+  document.querySelectorAll('#moduleTableBody .sign-toggle').forEach(el=>{el.classList.toggle('readonly',ro);});
+}
+function resetForm(){
+  editingId=null;
+  document.getElementById('formTitle').innerHTML='New Worker Training Card';
+  ['fName','fClims','fGrade','fAgency','fArea','workerId'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fFolder').value=activeFolder||FOLDERS[0];
+  currentPhotoData='';
+  document.getElementById('photoBox').innerHTML='📷 Click to Add Worker Photo';
+  document.getElementById('printFromFormBtn').style.display='none';
+  buildModuleRows(blankTrainings());
+  setFormReadOnly(false);
+}
+document.getElementById('cancelFormBtn').addEventListener('click',()=>{resetForm();goTo('panelList');});
+document.getElementById('saveWorkerBtn').addEventListener('click',()=>{
+  const name=document.getElementById('fName').value.trim();
+  const clims=document.getElementById('fClims').value.trim();
+  if(!name||!clims){toast('⚠ Name and CLIMS ID are required');return;}
+  const data={id:editingId||uid(),name,clims,
+    folder:document.getElementById('fFolder').value,
+    grade:document.getElementById('fGrade').value.trim(),
+    agency:document.getElementById('fAgency').value.trim(),
+    area:document.getElementById('fArea').value.trim(),
+    photo:currentPhotoData,trainings:collectTrainings(),updatedAt:Date.now()};
+  if(editingId){
+    const i=workers.findIndex(w=>w.id===editingId);
+    if(!data.photo){data.photo=workers[i].photo;data.photoUrl=workers[i].photoUrl;}
+    workers[i]=data;toast('✅ Card updated');
+  } else {workers.push(data);toast('✅ Card saved');}
+  save();resetForm();renderTable();renderDashboard();goTo('panelList');
+  pushWorkerToCloud(data);
+});
+
+function trainingStatus(w){
+  const done=w.trainings.filter(t=>t.date&&t.trainerSign&&t.workerSign).length;
+  if(done===0)return{label:'Not Started',cls:'badge-none',done};
+  if(done===MODULES.length)return{label:'Complete',cls:'badge-complete',done};
+  return{label:`${done}/${MODULES.length}`,cls:'badge-partial',done};
+}
+
+function renderDashboard(){
+  const total=workers.length;
+  const complete=workers.filter(w=>trainingStatus(w).done===MODULES.length).length;
+  const none=workers.filter(w=>trainingStatus(w).done===0).length;
+  const partial=total-complete-none;
+  document.getElementById('dashStats').innerHTML=
+    `<div class="stat"><b>${total}</b>Total Workers</div>
+     <div class="stat"><b style="color:var(--success)">${complete}</b>Complete</div>
+     <div class="stat"><b style="color:#8a6d3b">${partial}</b>Partial</div>
+     <div class="stat"><b style="color:var(--danger)">${none}</b>Not Started</div>
+     <div class="stat"><b>${FOLDERS.length}</b>Folders</div>`;
+
+  const fc=document.getElementById('folderCards');fc.innerHTML='';
+  FOLDERS.forEach(f=>{
+    const fw=workers.filter(w=>(w.folder||FOLDERS[0])===f);
+    const fComplete=fw.filter(w=>trainingStatus(w).done===MODULES.length).length;
+    const fNone=fw.filter(w=>trainingStatus(w).done===0).length;
+    const fPartial=fw.length-fComplete-fNone;
+    const div=document.createElement('div');
+    div.className='card';
+    div.style.cursor='pointer';
+    div.style.margin='0';
+    div.innerHTML=`<h2 style="margin-top:0">📁 ${escapeHtml(f)}</h2>
+      <div class="stats">
+        <div class="stat"><b>${fw.length}</b>Workers</div>
+        <div class="stat"><b style="color:var(--success)">${fComplete}</b>Complete</div>
+        <div class="stat"><b style="color:#8a6d3b">${fPartial}</b>Partial</div>
+        <div class="stat"><b style="color:var(--danger)">${fNone}</b>Not Started</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" data-act="open">Open Folder</button>
+        <button class="btn btn-success btn-sm" data-act="printAll" ${fw.length?'':'disabled'}>🖨 Print All (${fw.length})</button>
+      </div>`;
+    div.querySelector('[data-act="open"]').addEventListener('click',()=>{
+      activeFolder=f;
+      document.getElementById('filterFolder').value=f;
+      goTo('panelList');
+      renderTable();
+    });
+    const pAll=div.querySelector('[data-act="printAll"]');
+    if(pAll) pAll.addEventListener('click',(e)=>{e.stopPropagation();printFolder(f);});
+    fc.appendChild(div);
+  });
+}
+
+function renderTable(){
+  const tb=document.getElementById('workerTableBody');tb.innerHTML='';
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const fFolder=document.getElementById('filterFolder').value;
+  const fs=document.getElementById('filterStatus').value;
+  const aFolder=document.getElementById('advFolder').value;
+  const aName=document.getElementById('advName').value.trim().toLowerCase();
+  const aClims=document.getElementById('advClims').value.trim().toLowerCase();
+  const aGrade=document.getElementById('advGrade').value.trim().toLowerCase();
+  const aAgency=document.getElementById('advAgency').value.trim().toLowerCase();
+  const aArea=document.getElementById('advArea').value.trim().toLowerCase();
+  const aTrainer=document.getElementById('advTrainer').value.trim().toLowerCase();
+  const aModule=document.getElementById('advModule').value;
+  const aFrom=document.getElementById('advDateFrom').value;
+  const aTo=document.getElementById('advDateTo').value;
+  const aMin=parseInt(document.getElementById('advMinDone').value)||0;
+  const aPhoto=document.getElementById('advPhoto').value;
+  const aSort=document.getElementById('advSort').value;
+
+  let list=workers.filter(w=>{
+    const wFolder=w.folder||FOLDERS[0];
+    if(fFolder&&wFolder!==fFolder)return false;
+    if(aFolder&&wFolder!==aFolder)return false;
+    if(q){
+      const blob=(w.name+' '+w.clims+' '+wFolder+' '+(w.grade||'')+' '+(w.agency||'')+' '+(w.area||'')+' '+w.trainings.map(t=>t.trainer).join(' ')).toLowerCase();
+      if(!blob.includes(q))return false;
+    }
+    if(aName&&!w.name.toLowerCase().includes(aName))return false;
+    if(aClims&&!w.clims.toLowerCase().includes(aClims))return false;
+    if(aGrade&&!(w.grade||'').toLowerCase().includes(aGrade))return false;
+    if(aAgency&&!(w.agency||'').toLowerCase().includes(aAgency))return false;
+    if(aArea&&!(w.area||'').toLowerCase().includes(aArea))return false;
+    if(aTrainer&&!w.trainings.some(t=>(t.trainer||'').toLowerCase().includes(aTrainer)))return false;
+    if(aModule!==''){const t=w.trainings[+aModule];if(!t||!t.date)return false;}
+    if(aFrom&&!w.trainings.some(t=>t.date&&t.date>=aFrom))return false;
+    if(aTo&&!w.trainings.some(t=>t.date&&t.date<=aTo))return false;
+    if(aMin>0&&trainingStatus(w).done<aMin)return false;
+    if(aPhoto==='yes'&&!w.photo)return false;
+    if(aPhoto==='no'&&w.photo)return false;
+    if(fs){const d=trainingStatus(w).done;
+      if(fs==='complete'&&d!==MODULES.length)return false;
+      if(fs==='partial'&&(d===0||d===MODULES.length))return false;
+      if(fs==='none'&&d!==0)return false;}
+    return true;
+  });
+
+  list.sort((a,b)=>{
+    if(aSort==='name')return a.name.localeCompare(b.name);
+    if(aSort==='name_desc')return b.name.localeCompare(a.name);
+    if(aSort==='clims')return a.clims.localeCompare(b.clims);
+    if(aSort==='progress_desc')return trainingStatus(b).done-trainingStatus(a).done;
+    if(aSort==='progress_asc')return trainingStatus(a).done-trainingStatus(b).done;
+    return 0;
+  });
+
+  // stats
+  const total=workers.length;
+  const complete=workers.filter(w=>trainingStatus(w).done===MODULES.length).length;
+  const none=workers.filter(w=>trainingStatus(w).done===0).length;
+  const partial=total-complete-none;
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><b>${total}</b>Total</div>
+     <div class="stat"><b style="color:var(--success)">${complete}</b>Complete</div>
+     <div class="stat"><b style="color:#8a6d3b">${partial}</b>Partial</div>
+     <div class="stat"><b style="color:var(--danger)">${none}</b>Not Started</div>
+     <div class="stat"><b>${list.length}</b>Showing</div>`;
+
+  document.getElementById('workerCountTxt').textContent=total+' worker'+(total!==1?'s':'');
+  document.getElementById('emptyState').style.display=total===0?'block':'none';
+
+  list.forEach(w=>{
+    const st=trainingStatus(w);
+    const tr=document.createElement('tr');
+    const thumb=w.photo||w.photoUrl;
+    tr.innerHTML=`<td>${thumb?`<img src="${thumb}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`:'—'}</td>
+      <td>${escapeHtml(w.name)}</td><td>${escapeHtml(w.clims)}</td>
+      <td>${escapeHtml(w.folder||FOLDERS[0])}</td>
+      <td>${escapeHtml(w.grade||'-')}</td><td>${escapeHtml(w.agency||'-')}</td><td>${escapeHtml(w.area||'-')}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+      <td><div class="row-actions">
+        <button class="btn btn-outline btn-sm" onclick="viewWorker('${w.id}')">View</button>
+        <button class="btn btn-primary btn-sm" onclick="editWorker('${w.id}')">Edit</button>
+        <button class="btn btn-success btn-sm" onclick="printWorker('${w.id}')">Print</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteWorker('${w.id}')">Delete</button>
+      </div></td>`;
+    document.getElementById('workerTableBody').appendChild(tr);
+  });
+}
+
+['searchInput','filterFolder','filterStatus','advFolder','advName','advClims','advGrade','advAgency','advArea','advTrainer','advModule','advDateFrom','advDateTo','advMinDone','advPhoto','advSort'].forEach(id=>{
+  const el=document.getElementById(id);el.addEventListener('input',renderTable);el.addEventListener('change',renderTable);
+});
+document.getElementById('toggleAdv').addEventListener('click',()=>{
+  const a=document.getElementById('advSearch');a.style.display=a.style.display==='none'?'block':'none';
+});
+document.getElementById('clearSearch').addEventListener('click',()=>{
+  activeFolder='';
+  ['searchInput','advName','advClims','advGrade','advAgency','advArea','advTrainer','advDateFrom','advDateTo','advMinDone'].forEach(id=>document.getElementById(id).value='');
+  ['filterFolder','filterStatus','advFolder','advModule','advPhoto'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('advSort').value='name';
+  renderTable();
+});
+
+function viewWorker(id){editWorker(id,true);}
+function editWorker(id,ro=false){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  editingId=id;
+  document.getElementById('formTitle').innerHTML=(ro?'View: ':'Edit: ')+escapeHtml(w.name);
+  document.getElementById('workerId').value=w.id;
+  document.getElementById('fFolder').value=w.folder||FOLDERS[0];
+  document.getElementById('fName').value=w.name;
+  document.getElementById('fClims').value=w.clims;
+  document.getElementById('fGrade').value=w.grade||'';
+  document.getElementById('fAgency').value=w.agency||'';
+  document.getElementById('fArea').value=w.area||'';
+  currentPhotoData=w.photo||'';
+  const editThumb=w.photo||w.photoUrl;
+  document.getElementById('photoBox').innerHTML=editThumb?`<img src="${editThumb}">`:'📷 Click to Add Worker Photo';
+  buildModuleRows(w.trainings);
+  setFormReadOnly(ro);
+  document.getElementById('printFromFormBtn').style.display='inline-block';
+  document.getElementById('printFromFormBtn').onclick=()=>printWorker(id);
+  goTo('panelNew');
+}
+const DELETED_KEY="safety_training_cards_deleted_v1";
+function loadDeleted(){try{return new Set(JSON.parse(localStorage.getItem(DELETED_KEY)||"[]"));}catch(e){return new Set();}}
+function saveDeleted(set){try{localStorage.setItem(DELETED_KEY,JSON.stringify([...set]));}catch(e){}}
+let deletedIds=loadDeleted();
+
+function deleteWorker(id){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  if(confirm(`Delete card for "${w.name}"?`)){
+    workers=workers.filter(x=>x.id!==id);
+    deletedIds.add(id);saveDeleted(deletedIds);
+    save();renderTable();renderDashboard();toast('🗑 Deleted');
+    deleteWorkerFromCloud(id);
+  }
+}
+async function deleteWorkerFromCloud(id){
+  const url=getGasUrl();if(!url)return;
+  try{
+    await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'delete',id:id})});
+  }catch(e){/* offline ok — blacklist prevents re-add */}
+}
+function printWorker(id){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  document.getElementById('pFolder').textContent=w.folder||FOLDERS[0];
+  document.getElementById('pName').textContent=w.name;
+  document.getElementById('pClims').textContent=w.clims;
+  document.getElementById('pGrade').textContent=w.grade||'';
+  document.getElementById('pAgency').textContent=w.agency||'';
+  document.getElementById('pArea').textContent=w.area||'';
+  const pImg=document.getElementById('pPhoto');
+  const pPlaceholder=document.getElementById('pPhotoPlaceholder');
+  const photoSrc=w.photo||w.photoUrl||'';
+  if(photoSrc){pImg.src=photoSrc;pImg.style.display='block';pPlaceholder.style.display='none';}
+  else{pImg.removeAttribute('src');pImg.style.display='none';pPlaceholder.style.display='flex';}
+  const tb=document.getElementById('pModules');tb.innerHTML='';
+  MODULES.forEach((m,i)=>{
+    const t=w.trainings[i]||{date:'',trainer:'',trainerSign:false,workerSign:false};
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${m}</td><td>${t.date||''}</td><td>${escapeHtml(t.trainer||'')}</td>
+      <td style="text-align:center">${t.trainerSign?'✔':''}</td><td style="text-align:center">${t.workerSign?'✔':''}</td>`;
+    tb.appendChild(tr);
+  });
+  const pa=document.getElementById('printArea');
+  pa.style.zoom='1';
+  pa.style.display='block';
+  fitPrintAreaToOnePage();
+  window.print();
+  setTimeout(()=>{pa.style.display='none';pa.style.zoom='1';},500);
+}
+function printFolder(folderName){
+  const list=workers.filter(w=>(w.folder||FOLDERS[0])===folderName);
+  if(!list.length){toast('No workers in this folder');return;}
+  const pa=document.getElementById('printArea');
+  const originalHTML=pa.innerHTML;
+  const originalStyle=pa.getAttribute('style')||'';
+
+  const cardHTML=(w)=>{
+    const photoSrc=w.photo||w.photoUrl||'';
+    const photo=photoSrc
+      ? `<img src="${escapeHtml(photoSrc)}" alt="Worker photo" style="width:104px;height:122px;object-fit:cover;border-radius:9px;border:1.5px solid var(--navy);display:block;">`
+      : `<div class="pt-photo-placeholder">Worker Photo</div>`;
+    const rows=MODULES.map((m,i)=>{
+      const t=w.trainings[i]||{date:'',trainer:'',trainerSign:false,workerSign:false};
+      return `<tr><td>${i+1}</td><td>${escapeHtml(m)}</td><td>${escapeHtml(t.date||'')}</td><td>${escapeHtml(t.trainer||'')}</td><td style="text-align:center">${t.trainerSign?'✔':''}</td><td style="text-align:center">${t.workerSign?'✔':''}</td></tr>`;
+    }).join('');
+    return `<div class="pt-card-page"><div class="pt-card">
+      <div class="pt-stripe"></div>
+      <div class="pt-header">
+        <div class="pt-header-icon">🦺</div>
+        <div>
+          <p class="pt-title">Safety Training Card</p>
+          <div class="pt-subtitle pt-hide-print">Worker Safety Training Record &nbsp;•&nbsp; ${escapeHtml(w.folder||FOLDERS[0])}</div>
+        </div>
+      </div>
+      <div class="pt-info-wrap">
+        <div class="pt-photo-col">${photo}</div>
+        <div class="pt-info-grid">
+          <div class="pt-field pt-field-name"><span class="pt-label">Name of Worker</span><span class="pt-value">${escapeHtml(w.name||'')}</span></div>
+          <div class="pt-field-row">
+            <div class="pt-field"><span class="pt-label">CLIMS ID</span><span class="pt-value">${escapeHtml(w.clims||'')}</span></div>
+            <div class="pt-field"><span class="pt-label">Grade</span><span class="pt-value">${escapeHtml(w.grade||'')}</span></div>
+          </div>
+          <div class="pt-field-row">
+            <div class="pt-field"><span class="pt-label">Name of Agency</span><span class="pt-value">${escapeHtml(w.agency||'')}</span></div>
+            <div class="pt-field"><span class="pt-label">Work Area</span><span class="pt-value">${escapeHtml(w.area||'')}</span></div>
+          </div>
+        </div>
+      </div>
+      <table class="pt-modules">
+        <thead><tr><th>S.N</th><th>Training Module Name</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div></div>`;
+  };
+
+  pa.innerHTML=list.map(cardHTML).join('');
+  pa.style.zoom='1';
+  pa.style.display='block';
+  window.print();
+  setTimeout(()=>{
+    pa.style.display='none';
+    pa.setAttribute('style',originalStyle);
+    pa.innerHTML=originalHTML;
+  },800);
+}
+
+function fitPrintAreaToOnePage(){
+  // Makes the printed card always fill exactly one full A4 page, in both the
+  // browser's print preview and the actual print — never small-and-stranded in
+  // a corner, never spilling onto a 2nd page.
+  const pa=document.getElementById('printArea');
+  const modulesBody=document.getElementById('pModules');
+  const maxHeightMM=283; // small safety margin under A4 usable height (297mm - 2*6mm page margin)
+  const maxHeightPx=maxHeightMM*96/25.4;
+
+  // Reset any adjustment from a previous print
+  pa.style.zoom='1';
+  modulesBody.querySelectorAll('td').forEach(td=>{td.style.paddingTop='';td.style.paddingBottom='';});
+
+  let naturalHeight=pa.scrollHeight;
+
+  if(naturalHeight<maxHeightPx){
+    // Content is shorter than a full page — stretch the module rows (not zoom,
+    // so width/margins stay exactly as designed) so the card fills the whole page.
+    const rows=modulesBody.querySelectorAll('tr');
+    if(rows.length){
+      const extraPerRow=(maxHeightPx-naturalHeight)/rows.length;
+      const extraPad=Math.max(0,extraPerRow/2);
+      modulesBody.querySelectorAll('td').forEach(td=>{
+        td.style.paddingTop=(2.5+extraPad)+'px';
+        td.style.paddingBottom=(2.5+extraPad)+'px';
+      });
+    }
+    naturalHeight=pa.scrollHeight;
+  }
+
+  if(naturalHeight>maxHeightPx){
+    // Still (or newly) taller than one page — shrink using "zoom", which actually
+    // resizes the layout box (unlike transform:scale, which only changes the paint
+    // and would still overflow onto a 2nd page during print pagination).
+    let z=1,h=naturalHeight,guard=0;
+    while(h>maxHeightPx && z>0.5 && guard<15){
+      z=Math.max(0.5, z*(maxHeightPx/h)*0.98);
+      pa.style.zoom=z;
+      h=pa.scrollHeight;
+      guard++;
+    }
+  }
+}
+
+
+
+
+/* ---------------- CLOUD SYNC (Google Sheet + Google Drive via Apps Script) ---------------- */
+const DEFAULT_GAS_URL='https://script.google.com/macros/s/AKfycbzfBKbvM3-ZULGhGjnMg247OZZVC0fKT3Zvn_y6EMyZ97rCSFdA0Q6W2mJ89Cpaj4IP0Q/exec';
+const GAS_KEY='safety_training_cards_gas_url';
+function getGasUrl(){try{return localStorage.getItem(GAS_KEY)||DEFAULT_GAS_URL;}catch(e){return DEFAULT_GAS_URL;}}
+function setGasUrl(u){try{if(u)localStorage.setItem(GAS_KEY,u);else localStorage.removeItem(GAS_KEY);}catch(e){}}
+function updateGasStatus(){
+  const u=getGasUrl();
+  document.getElementById('gasStatus').innerHTML=u
+    ?`✅ Connected: <code style="word-break:break-all;">${escapeHtml(u)}</code>`
+    :'⚠ Not connected yet. Paste your Apps Script Web App URL above and click "Save URL".';
+}
+document.getElementById('gasUrlInput').value=getGasUrl();
+updateGasStatus();
+
+document.getElementById('saveGasUrlBtn').addEventListener('click',()=>{
+  const v=document.getElementById('gasUrlInput').value.trim();
+  setGasUrl(v);updateGasStatus();
+  toast(v?'💾 Cloud URL saved':'URL cleared');
+});
+document.getElementById('clearGasUrlBtn').addEventListener('click',()=>{
+  setGasUrl('');document.getElementById('gasUrlInput').value='';updateGasStatus();
+  toast('☁ Disconnected from cloud');
+});
+
+async function testGasConnection(){
+  const url=getGasUrl();
+  if(!url){toast('⚠ Please save URL first');return;}
+  toast('🔌 Testing connection...');
+  try{
+    const sep=url.includes('?')?'&':'?';
+    const res=await fetch(url+sep+'action=ping');
+    const json=await res.json();
+    toast(json&&json.status==='success'?'✅ Connection OK':'⚠ Unexpected response from Apps Script');
+  }catch(err){
+    toast('❌ Connection failed: '+err.message);
+  }
+}
+document.getElementById('testGasBtn').addEventListener('click',testGasConnection);
+
+async function pushWorkerToCloud(data){
+  const url=getGasUrl();
+  if(!url)return;
+  try{
+    const res=await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight
+      body:JSON.stringify(data)
+    });
+    const json=await res.json();
+    if(json&&json.status==='success'){
+      const i=workers.findIndex(w=>w.id===data.id);
+      if(i!==-1){workers[i].photoUrl=json.driveUrl||workers[i].photoUrl;workers[i].synced=true;save();}
+      /* silent cloud save */
+    } else {
+      console.warn('Cloud save failed', json);
+    }
+  }catch(err){
+    console.warn('Cloud sync failed', err);
+  }
+}
+
+async function pushAllToCloud(){
+  const url=getGasUrl();
+  if(!url){toast('⚠ Please save URL first');return;}
+  if(workers.length===0){toast('No worker records found');return;}
+  toast(`⬆ Uploading ${workers.length} record(s)...`);
+  for(const w of workers){await pushWorkerToCloud(w);}
+  toast('✅ All records pushed to cloud');
+}
+document.getElementById('pushAllBtn').addEventListener('click',pushAllToCloud);
+
+async function pullFromCloud(silent){
+  const url=getGasUrl();
+  if(!url){if(!silent)toast('⚠ Please save URL first');return;}
+  try{
+    const sep=url.includes('?')?'&':'?';
+    const res=await fetch(url+sep+'action=list');
+    const json=await res.json();
+    if(!json||json.status!=='success'||!Array.isArray(json.data)){
+      if(!silent)toast('⚠ Sync failed: unexpected response');
+      return;
+    }
+    let added=0,updated=0,removed=0;
+    const cloudIds=new Set(json.data.map(cw=>cw.id));
+    json.data.forEach(cw=>{
+      if(deletedIds.has(cw.id))return; // skip locally deleted records
+      const i=workers.findIndex(w=>w.id===cw.id);
+      if(i===-1){cw.synced=true;workers.push(cw);added++;}
+      else{
+        const local=workers[i];
+        if((cw.updatedAt||0)>(local.updatedAt||0)){
+          workers[i]={...cw,photo:(local.photo&&!cw.photo)?local.photo:cw.photo,synced:true};
+          updated++;
+        } else {
+          workers[i].synced=true; // confirms this record still exists on the sheet
+        }
+      }
+    });
+    // Reconcile deletions made directly in the Google Sheet: a record that was
+    // previously confirmed synced but is no longer in the cloud list was deleted
+    // there, so remove it locally too. Records never yet synced (e.g. created
+    // offline, cloud push still pending) are always kept, so we never lose new data.
+    const before=workers.length;
+    workers=workers.filter(w=>{
+      const stillThere=cloudIds.has(w.id)||!w.synced;
+      if(!stillThere)deletedIds.add(w.id);
+      return stillThere;
+    });
+    removed=before-workers.length;
+    if(removed>0)saveDeleted(deletedIds);
+    save();renderTable();renderDashboard();
+    if(!silent)toast(`☁ Synced: ${added} added, ${updated} updated${removed?', '+removed+' removed':''}`);
+  }catch(err){
+    if(!silent)toast('⚠ Sync error: '+err.message);
+  }
+}
+document.getElementById('pullNowBtn').addEventListener('click',()=>pullFromCloud(false));
+
+load();buildModuleRows(blankTrainings());renderTable();renderDashboard();
+if(getGasUrl())pullFromCloud(true); // silent background sync on load
+</script>
+</body>
+</html>
