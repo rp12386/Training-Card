@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Training Card Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+<style>
+  :root{
+    --navy:#0f2942; --navy-2:#1c4269; --navy-deep:#081826;
+    --amber:#f2a53d; --amber-dark:#c17f1c; --amber-light:#fdf1de;
+    --bg:#eef1f6; --card-bg:#fff;
+    --border:#dde3ec; --border-soft:#e9edf3;
+    --text:#1c2531; --muted:#67748a;
+    --danger:#d6483f; --danger-dark:#ad3830; --danger-light:#fbe6e4;
+    --success:#1f8a4c; --success-dark:#166638; --success-light:#e1f4e9;
+    --font-display:'Oswald',"Segoe UI",Arial,sans-serif;
+    --font-body:'Inter',"Segoe UI",Arial,sans-serif;
+    --stripe:repeating-linear-gradient(45deg,var(--amber) 0 12px,var(--navy-2) 12px 24px);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+  body::before{content:'';display:block;height:5px;background:var(--stripe);}
+  ::selection{background:var(--amber-light);color:var(--navy-deep);}
+  ::-webkit-scrollbar{width:10px;height:10px;} ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:#c3ccd9;border-radius:10px;} ::-webkit-scrollbar-thumb:hover{background:#a9b4c4;}
+
+  header{background:linear-gradient(135deg,var(--navy),var(--navy-deep));color:#fff;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:0 2px 10px rgba(8,24,38,.25);position:relative;z-index:60;}
+  header .brand{display:flex;align-items:center;gap:12px;}
+  header .brand-icon{width:38px;height:38px;border-radius:9px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  header h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:.3px;text-transform:uppercase;}
+  header .sub{font-size:12px;opacity:.75;margin-top:1px;}
+
+  nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 26px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(15,41,66,.03);}
+  nav button{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:9px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s ease;}
+  nav button:hover{background:var(--amber-light);border-color:var(--amber);color:var(--amber-dark);}
+  nav button.active{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(15,41,66,.3);}
+
+  main{padding:22px 26px 60px;max-width:1150px;margin:0 auto;}
+  .panel{display:none;} .panel.active{display:block;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(15,41,66,.04),0 8px 20px -12px rgba(15,41,66,.12);}
+  .card h2{margin-top:0;font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:.3px;text-transform:uppercase;color:var(--navy);border-bottom:2px solid var(--border-soft);padding-bottom:10px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;} @media(max-width:680px){.grid2{grid-template-columns:1fr;}}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;} @media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr);}} @media(max-width:520px){.grid4{grid-template-columns:1fr;}}
+
+  label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px;}
+  input[type=text],input[type=date],input[type=password],select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font-body);background:#fff;color:var(--text);transition:.15s ease;}
+  input[type=text]:focus,input[type=date]:focus,input[type=password]:focus,select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(242,165,61,.22);}
+  .field{margin-bottom:13px;}
+  .sign-toggle{display:inline-flex;align-items:center;justify-content:center;width:56px;height:30px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;user-select:none;background:#fff;color:var(--success-dark);border:1.5px solid var(--border);transition:.15s ease;}
+  .sign-toggle:hover{border-color:var(--amber);background:var(--amber-light);}
+  .sign-toggle.is-done{background:var(--success-light);border-color:var(--success);}
+  .sign-toggle.readonly{cursor:default;}
+  .sign-toggle.readonly:hover{border-color:var(--border);background:#fff;}
+  .sign-toggle.readonly.is-done:hover{background:var(--success-light);border-color:var(--success);}
+
+  .photo-box{width:120px;height:120px;border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;overflow:hidden;background:var(--bg);margin-bottom:10px;transition:.15s ease;}
+  .photo-box:hover{border-color:var(--amber);color:var(--amber-dark);background:var(--amber-light);}
+  .photo-box img{width:100%;height:100%;object-fit:cover;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{border:1px solid var(--border-soft);padding:8px 9px;text-align:left;vertical-align:middle;}
+  thead th{background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+  tbody tr:nth-child(even){background:#f7f9fb;} tbody tr:hover{background:var(--amber-light);}
+  .hindi{font-size:11px;color:var(--muted);display:block;}
+
+  .btn{border:none;padding:9px 17px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--font-body);cursor:pointer;transition:.15s ease;box-shadow:0 1px 2px rgba(15,41,66,.08);}
+  .btn:hover{transform:translateY(-1px);} .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--navy);color:#fff;} .btn-primary:hover{background:var(--navy-2);box-shadow:0 4px 10px rgba(15,41,66,.3);}
+  .btn-success{background:var(--success);color:#fff;} .btn-success:hover{background:var(--success-dark);box-shadow:0 4px 10px rgba(31,138,76,.3);}
+  .btn-danger{background:var(--danger);color:#fff;} .btn-danger:hover{background:var(--danger-dark);box-shadow:0 4px 10px rgba(214,72,63,.3);}
+  .btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--border);} .btn-outline:hover{background:var(--amber-light);border-color:var(--amber);color:var(--amber-dark);}
+  .btn-sm{padding:6px 12px;font-size:12px;}
+
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+  .search-box{flex:1;min-width:220px;}
+  .adv-search{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+  .adv-search h3{margin:0 0 10px;font-family:var(--font-display);font-size:13px;text-transform:uppercase;letter-spacing:.3px;color:var(--navy);}
+  .empty-state{text-align:center;color:var(--muted);padding:44px 10px;font-size:14px;}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .badge-complete{background:var(--success-light);color:var(--success-dark);}
+  .badge-partial{background:var(--amber-light);color:var(--amber-dark);}
+  .badge-none{background:var(--danger-light);color:var(--danger-dark);}
+  .module-table th:nth-child(1){width:36px;} .module-table th:nth-child(2){width:30%;}
+
+  #toast{position:fixed;bottom:24px;right:24px;background:var(--navy-deep);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:.25s;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.25);border-left:4px solid var(--amber);}
+  #toast.show{opacity:1;transform:translateY(0);}
+
+  .mode-banner{padding:9px 14px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:12px;border-left:5px solid;}
+  .mode-banner.mode-new{background:#e8f1fa;border-color:#2b6cb0;color:#1a4d80;}
+  .mode-banner.mode-edit{background:#fff5df;border-color:var(--amber);color:#7a5200;}
+  .mode-banner.mode-view{background:#eef0f2;border-color:#8a96a3;color:#4a5560;}
+  .step-list{margin:0;padding-left:0;list-style:none;counter-reset:st;}
+  .step-list li{counter-increment:st;position:relative;padding:10px 12px 10px 48px;margin-bottom:8px;background:#f6f8fa;border-radius:8px;font-size:13.5px;line-height:1.55;}
+  .step-list li::before{content:counter(st);position:absolute;left:12px;top:10px;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .code-box{width:100%;height:230px;font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.45;border:1px solid var(--border,#cfd6dd);border-radius:8px;padding:10px;background:#0f1b27;color:#d6e4f0;resize:vertical;box-sizing:border-box;white-space:pre;overflow:auto;}
+  .sync-stats{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;}
+  .sync-stat{background:#f1f5f9;border-radius:8px;padding:8px 14px;font-size:12.5px;}
+  .sync-stat b{display:block;font-size:17px;color:var(--navy);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  #adminBtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:.15s ease;}
+  #adminBtn:hover{background:rgba(255,255,255,.22);}
+  #adminBtn.on{background:var(--success);border-color:var(--success);}
+  .modal-back{position:fixed;inset:0;background:rgba(8,24,38,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+  .modal-box{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:360px;box-shadow:0 20px 50px rgba(0,0,0,.35);border-top:5px solid var(--amber);}
+  .modal-box h3{margin:0 0 8px;font-family:var(--font-display);font-size:18px;text-transform:uppercase;color:var(--navy);letter-spacing:.3px;}
+  #moduleTableBody input[data-locked="1"][readonly]{background:#f3f5f8;cursor:not-allowed;}
+  #moduleTableBody .mDate.is-empty:not(:focus){color:transparent;}
+  #moduleTableBody .mDate.is-empty:not(:focus)::-webkit-calendar-picker-indicator{opacity:0;}
+  #adminErr{color:var(--danger-dark);font-size:12.5px;font-weight:600;min-height:18px;margin-top:6px;}
+  .form-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:-6px;margin-bottom:14px;line-height:1.5;}
+
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .stat{background:#fff;border:1px solid var(--border);border-left:4px solid var(--navy);border-radius:10px;padding:9px 16px;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.2px;box-shadow:0 1px 2px rgba(15,41,66,.04);}
+  .stat b{font-family:var(--font-display);color:var(--navy);font-size:19px;font-weight:600;display:block;text-transform:none;letter-spacing:0;margin-bottom:1px;}
+
+   /* ---------- PRINT: SAFETY TRAINING CARD ---------- */
+   @page{size:A4 portrait;margin:6mm;}
+   #printArea{width:198mm;padding:0;margin:0;font-family:var(--font-body);}
+   @media print{
+     body::before{display:none!important;}
+     html,body{width:210mm;margin:0;padding:0;}
+     body *{visibility:hidden;} #printArea, #printArea *{visibility:visible;}
+     #printArea{position:absolute;top:0;left:0;}
+     header,nav,#toast{display:none!important;}
+     body>*:not(#printArea){display:none!important;}
+     html,body{height:auto!important;overflow:visible!important;}
+     .pt-modules tr{page-break-inside:avoid;}
+     .pt-modules{page-break-inside:avoid;}
+     #printArea{page-break-after:avoid;page-break-inside:avoid;}
+     .pt-card-page{page-break-after:always;page-break-inside:avoid;}
+     .pt-card-page:last-child{page-break-after:auto;}
+   }
+
+   .pt-card{border:1.5px solid var(--navy);border-radius:12px;overflow:hidden;background:#fff;}
+   .pt-stripe{height:5px;background:var(--stripe);}
+   .pt-header{background:linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;padding:12px 18px;display:flex;align-items:center;gap:13px;}
+   .pt-header-icon{width:36px;height:36px;border-radius:9px;background:var(--amber);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;}
+   .pt-title{font-family:var(--font-display);font-weight:600;font-size:21px;letter-spacing:.7px;text-transform:uppercase;margin:0;}
+   .pt-subtitle{font-size:11px;letter-spacing:.3px;opacity:.85;margin-top:2px;}
+
+   .pt-info-wrap{display:flex;gap:16px;padding:13px 18px;border-bottom:1.5px solid var(--navy);align-items:center;}
+   .pt-photo-col{flex:0 0 104px;width:104px;}
+   .pt-photo-col img{width:104px;height:122px;object-fit:cover;border-radius:9px;border:1.5px solid var(--navy);display:none;}
+   .pt-photo-placeholder{width:104px;height:122px;border-radius:9px;border:1.5px dashed #b7c0cd;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#9aa7b6;text-align:center;padding:4px;line-height:1.3;}
+   .pt-info-grid{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;}
+   .pt-field-name .pt-value{font-size:18.5px;}
+   .pt-field-row{display:flex;gap:24px;}
+   .pt-field{flex:1;min-width:0;}
+   .pt-label{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;}
+   .pt-value{display:block;font-size:14px;font-weight:700;color:var(--text);margin-top:2px;font-family:var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+   .pt-modules{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed;}
+   .pt-modules th,.pt-modules td{border:1px solid #c7d0dc;padding:4.5px 6px;word-wrap:break-word;line-height:1.22;}
+   .pt-modules thead th{background:var(--navy);color:#fff;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;padding:7px 6px;}
+   .pt-modules tbody tr:nth-child(even){background:#f4f7fa;}
+   .pt-modules th:nth-child(1),.pt-modules td:nth-child(1){width:28px;text-align:center;color:var(--navy);font-weight:700;}
+   .pt-modules th:nth-child(2),.pt-modules td:nth-child(2){width:31%;}
+   .pt-modules th:nth-child(3),.pt-modules td:nth-child(3){width:14%;height:22px;}
+   .pt-modules th:nth-child(4),.pt-modules td:nth-child(4){width:18%;height:22px;}
+   .pt-modules th:nth-child(5),.pt-modules td:nth-child(5){width:14%;height:22px;text-align:center;}
+   .pt-modules th:nth-child(6),.pt-modules td:nth-child(6){width:14%;height:22px;text-align:center;}
+  .pt-hide-print{}
+  @media print{ .pt-hide-print{display:none!important;} }
+/* ===== Modern / interactive layer ===== */
+html{scroll-behavior:smooth}
+
+.panel.active{animation:panelIn .35s ease both}
+@keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{border-radius:16px;transition:box-shadow .25s,transform .25s}
+#folderCards .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(8,24,38,.16)}
+.btn{transition:transform .15s,box-shadow .2s,filter .2s,background .2s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(8,24,38,.18);filter:brightness(1.05)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.97)}
+.nav-btn{transition:transform .15s,background .2s,box-shadow .2s}
+.nav-btn:hover{transform:translateY(-1px)}
+input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(242,165,61,.35);border-color:var(--amber)!important;transition:box-shadow .2s}
+.panel tbody tr{transition:background .15s}
+.panel tbody tr:hover{background:var(--amber-light)!important}
+.stat{transition:transform .2s,box-shadow .2s}.stat:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(8,24,38,.12)}
+.mini-bar{height:5px;border-radius:5px;background:var(--border);margin-top:5px;overflow:hidden;min-width:60px}
+.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--success));border-radius:5px;transition:width .6s ease}
+.sign-toggle{transition:transform .15s,background .2s}.sign-toggle:hover{transform:scale(1.12)}
+.folder-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+#toast{transition:opacity .3s,transform .3s}
+@media print{@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+nav #adminBtn{background:var(--amber-light);color:var(--navy);border:1.5px solid var(--amber);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700}
+nav #adminBtn:hover{background:var(--amber);color:var(--navy-deep);transform:translateY(-1px)}
+nav #adminBtn.on{background:var(--success);border-color:var(--success);color:#fff}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🦺</div>
+    <div>
+      <h1>Safety Training Card Manager</h1>
+      <div class="sub">Worker Safety Training Records System</div>
+    </div>
+  </div>
+</header>
+
+<div class="modal-back" id="adminModal">
+  <div class="modal-box">
+    <h3>🔒 Admin Login</h3>
+    <div class="hint" id="adminModalMsg" style="margin-top:0">Enter the admin password to delete data.</div>
+    <input type="password" id="adminPass" placeholder="Admin password" autocomplete="off">
+    <div id="adminErr"></div>
+    <div class="form-actions" style="margin-top:10px">
+      <button class="btn btn-primary" id="adminLoginBtn" type="button">Login</button>
+      <button class="btn btn-outline" id="adminCancelBtn" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <button data-panel="panelDashboard" class="nav-btn active">🏠 Dashboard</button>
+  <button data-panel="panelList" class="nav-btn">📋 View / Search</button>
+  <button data-panel="panelNew" class="nav-btn">➕ New Worker</button>
+  <button data-panel="panelModules" class="nav-btn">📚 Module Manager</button>
+  <button id="adminBtn" type="button">🔒 Admin Login</button>
+  <button data-panel="panelSync" class="nav-btn" id="syncNavBtn" style="display:none">☁ Google Sheet &amp; Drive</button>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panelDashboard">
+    <div class="card">
+      <h2>Dashboard</h2>
+      <div class="stats" id="dashStats"></div>
+    </div>
+    <div class="card">
+      <h2>Folders</h2>
+      <div class="hint">Each folder keeps its own set of saved worker training cards. Click a folder to view its workers.</div>
+<div class="folder-toolbar"><button class="btn btn-primary" id="addFolderBtn" type="button">➕ New Folder</button></div>
+      <div class="grid2" id="folderCards"></div>
+    </div>
+  </div>
+
+  <!-- LIST / SEARCH -->
+  <div class="panel" id="panelList">
+    <div class="card">
+      <h2>Worker List</h2>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="🔍 Quick search across all fields...">
+        </div>
+        <select id="filterFolder">
+          <option value="">All Folders</option>
+        </select>
+        <select id="filterStatus">
+          <option value="">All Status</option>
+          <option value="complete" id="optComplete">Complete (25/25)</option>
+          <option value="partial">Partial</option>
+          <option value="none">Not Started</option>
+        </select>
+        <button class="btn btn-outline btn-sm" id="toggleAdv">⚙ Advanced Search</button>
+        <button class="btn btn-outline btn-sm" id="clearSearch">✖ Clear</button>
+        <button class="btn btn-outline btn-sm" id="exportCsvBtn">⬇ Export CSV</button>
+      </div>
+
+      <div class="adv-search" id="advSearch" style="display:none">
+        <h3>Advanced Search</h3>
+        <div class="grid4">
+          <div><label>Folder</label>
+            <select id="advFolder"><option value="">Any</option></select>
+          </div>
+          <div><label>Name</label><input type="text" id="advName"></div>
+          <div><label>CLIMS ID</label><input type="text" id="advClims"></div>
+          <div><label>Grade</label><input type="text" id="advGrade"></div>
+          <div><label>Agency</label><input type="text" id="advAgency"></div>
+          <div><label>Work Area</label><input type="text" id="advArea"></div>
+          <div><label>Trainer Name</label><input type="text" id="advTrainer"></div>
+          <div><label>Training Module</label>
+            <select id="advModule"><option value="">Any</option></select>
+          </div>
+          <div><label>Training Date From</label><input type="date" id="advDateFrom"></div>
+          <div><label>Training Date To</label><input type="date" id="advDateTo"></div>
+          <div><label>Min Completed Modules</label><input type="text" id="advMinDone" placeholder="0-25"></div>
+          <div><label>Has Photo</label>
+            <select id="advPhoto"><option value="">Any</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div><label>Sort By</label>
+            <select id="advSort">
+              <option value="name">Name (A-Z)</option>
+              <option value="name_desc">Name (Z-A)</option>
+              <option value="clims">CLIMS ID</option>
+              <option value="progress_desc">Progress (High-Low)</option>
+              <option value="progress_asc">Progress (Low-High)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <table id="workerTable">
+        <thead>
+          <tr>
+            <th>Photo</th><th>Name</th><th>CLIMS ID</th>
+            <th>Folder</th><th>Grade</th><th>Agency</th><th>Work Area</th><th>Training Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="workerTableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState">No workers added yet. Click "New Worker" to add your first training card.</div>
+    </div>
+  </div>
+
+  <!-- NEW / EDIT -->
+  <div class="panel" id="panelNew">
+    <div class="card">
+      <div id="modeBanner" class="mode-banner mode-new"></div>
+      <h2 id="formTitle">New Worker Training Card</h2>
+      <input type="hidden" id="workerId">
+      <div class="grid2">
+        <div>
+          <div class="field"><label>Folder *</label>
+            <select id="fFolder">
+              <option value="EMD Lighting">EMD Lighting</option>
+              <option value="EMD Cable">EMD Cable</option>
+            </select>
+          </div>
+          <div class="field"><label>Name of Worker *</label><input type="text" id="fName"></div>
+          <div class="field"><label>CLIMS ID *</label><input type="text" id="fClims"></div>
+          <div class="field"><label>Grade</label><input type="text" id="fGrade"></div>
+          <div class="field"><label>Name of Agency</label><input type="text" id="fAgency"></div>
+          <div class="field"><label>Work Area</label><input type="text" id="fArea"></div>
+        </div>
+        <div>
+          <label>Worker Photo</label>
+          <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">📷 Click to Add Worker Photo</div>
+          <input type="file" id="photoInput" accept="image/*" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Training Modules</h2>
+      <table class="module-table">
+        <thead><tr><th>S.N</th><th>Training Module</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th><th>Action</th></tr></thead>
+        <tbody id="moduleTableBody"></tbody>
+      </table>
+      <div class="form-actions" style="margin-bottom:6px">
+        <button class="btn btn-primary" id="addModuleFromCardBtn" type="button">➕ Add Module</button>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" id="saveWorkerBtn">💾 Save Card</button>
+        <button class="btn btn-primary" id="saveStayBtn" style="display:none">💾 Save &amp; Continue Editing</button>
+        <button class="btn btn-primary" id="editFromViewBtn" style="display:none">✏ Edit This Card</button>
+        <button class="btn btn-success" id="printFromFormBtn" style="display:none">🖨 Print Card</button>
+        <button class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE MODULES -->
+  <div class="panel" id="panelModules">
+    <div class="card">
+      <h2>Manage Training Modules</h2>
+      <div class="hint">
+        Add, rename, reorder (↑ ↓) or delete modules here. When you click <b>Save Changes</b>, the updated module list appears on <b>every worker's card</b> (existing workers keep their data; new modules start blank). Nothing changes until you save.<br>
+        ⚠ Deleting a module also removes its date / trainer / sign data for all workers. <b>Admin login</b> is required to delete a module.
+      </div>
+      <table>
+        <thead><tr><th style="width:44px">S.N</th><th>Training Module Name</th><th style="width:130px">Workers with data</th><th style="width:210px">Actions</th></tr></thead>
+        <tbody id="modMgrBody"></tbody>
+      </table>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="modAddBtn">➕ Add Module</button>
+        <button class="btn btn-success" id="modSaveBtn">💾 Save Changes</button>
+        <button class="btn btn-outline" id="modDiscardBtn">↩ Discard Changes</button>
+        <button class="btn btn-outline" id="modDefaultBtn">♻ Restore Default List</button>
+      </div>
+      <div id="modMgrInfo" class="hint" style="margin-top:12px;margin-bottom:0"></div>
+    </div>
+  </div>
+
+  <!-- GOOGLE SHEET & DRIVE -->
+  <div class="panel" id="panelSync">
+    <div class="card">
+      <h2>☁ Google Sheet &amp; Drive Sync</h2>
+      <div id="gasStatus" style="font-size:13.5px;"></div>
+      <div class="sync-stats" id="gasStats"></div>
+      <div class="form-actions">
+        <button class="btn btn-success" id="syncNowBtn">🔄 Sync Now</button>
+        <a class="btn btn-outline" id="openSheetLink" target="_blank" rel="noopener" style="display:none;text-decoration:none">📄 Open Google Sheet</a>
+        <a class="btn btn-outline" id="openFolderLink" target="_blank" rel="noopener" style="display:none;text-decoration:none">📁 Open Drive Folder</a>
+        <button class="btn btn-outline" id="pullNowBtn">⬇ Pull from Sheet</button>
+        <button class="btn btn-outline" id="pushAllBtn">⬆ Push All to Cloud</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Connection Settings</h2>
+      <div class="field">
+        <label>Google Apps Script Web App URL</label>
+        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/XXXXXXXXXXXX/exec">
+      </div>
+      <div class="field">
+        <label>Access Key (optional — Code.gs ke ACCESS_KEY jaisa hi)</label>
+        <input type="password" id="gasKeyInput" placeholder="leave empty if no key is set in Code.gs" autocomplete="off">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" id="saveGasUrlBtn">💾 Save &amp; Connect</button>
+        <button class="btn btn-primary" id="testGasBtn">🔌 Test Connection</button>
+        <button class="btn btn-danger" id="clearGasUrlBtn">✖ Disconnect</button>
+      </div>
+      <div class="hint" style="margin:10px 0 0">Admin login is required to change the URL / key or to disconnect.</div>
+    </div>
+
+    <div class="card">
+      <h2>Setup Guide (one-time only)</h2>
+      <ol class="step-list">
+        <li>Sign in to your Google account and open <b>script.google.com</b> &rarr; <b>New project</b> &rarr; name it <i>Safety Training Cards</i>.</li>
+        <li>Delete the existing code in the editor and paste the code below (<b>Copy Code</b> button) &rarr; press <b>Ctrl+S</b> to save.</li>
+        <li><i>(Optional)</i> In the code, set a secret word for <code>ACCESS_KEY</code> and enter the same word in the <b>Access Key</b> box above. Only your website will then be able to send/receive data.</li>
+        <li>In the function dropdown at the top of the editor, select <b>setup</b> &rarr; <b>&#9654; Run</b> &rarr; <i>Review permissions</i> &rarr; your account &rarr; <i>Advanced</i> &rarr; <i>Go to project (unsafe)</i> &rarr; <b>Allow</b>. (Google shows this warning because the script is your own.) This automatically creates a Google Sheet named <b>Safety Training Cards</b> and a Drive folder named <b>Safety Training Photos</b>.</li>
+        <li><b>Deploy &rarr; New deployment</b> &rarr; &#9881; choose type <b>Web app</b> &rarr; <i>Execute as:</i> <b>Me</b> &nbsp;|&nbsp; <i>Who has access:</i> <b>Anyone</b> &rarr; <b>Deploy</b> &rarr; copy the <b>Web app URL</b>.</li>
+        <li>Paste that URL in the <b>Web App URL</b> box above and click <b>Save &amp; Connect</b> (admin password required). The website will test the connection and send all workers to the Sheet.</li>
+      </ol>
+      <div class="hint" style="margin:10px 0">After changing the code: <b>Deploy &rarr; Manage deployments &rarr; &#9998; Edit &rarr; Version: New version &rarr; Deploy</b> (the URL stays the same).</div>
+      <div class="form-actions" style="margin-bottom:8px">
+        <button class="btn btn-primary" id="copyCodeBtn">📋 Copy Code</button>
+        <button class="btn btn-outline" id="downloadCodeBtn">⬇ Download Code.gs</button>
+      </div>
+      <textarea class="code-box" id="gsCode" readonly spellcheck="false">/**
+ * SAFETY TRAINING CARDS - Google Sheet + Google Drive backend
+ * ------------------------------------------------------------
+ * This script saves the website data to a Google Sheet and worker photos to Google Drive.
+ *
+ * Setup (the same steps are also shown in the website's "Google Sheet &amp; Drive" tab):
+ *   1. Paste this entire code into the Apps Script editor (remove the old code).
+ *   2. (Optional) Set a secret word in ACCESS_KEY below. Enter the same word in the website.
+ *   3. Select  setup  in the function dropdown above, click Run -&gt; Allow permissions.
+ *      This creates the "Safety Training Cards" Google Sheet and the "Safety Training Photos" Drive folder.
+ *   4. Deploy &gt; New deployment &gt; Web app
+ *        Execute as: Me      |      Who has access: Anyone
+ *      Then paste the "Web app URL" you receive into the website.
+ *
+ * After changing the code: Deploy &gt; Manage deployments &gt; Edit &gt; Version: New version &gt; Deploy.
+ */
+
+const ACCESS_KEY    = '';     // optional secret key (empty = no key)
+const PUBLIC_PHOTOS = true;   // true: photo is viewable by anyone with the link (required to show photos on the website)
+const SHEET_TITLE   = 'Safety Training Cards';
+const FOLDER_TITLE  = 'Safety Training Photos';
+const WORKERS_SHEET = 'Workers';
+
+const FIXED_HEADERS = ['ID', 'Folder', 'Name', 'CLIMS ID', 'Grade', 'Agency', 'Work Area',
+  'Photo URL', 'Photo File ID', 'Updated At (ms)', 'Modules Done', 'Last Updated', 'Trainings JSON'];
+const FIXED = FIXED_HEADERS.length;
+
+/* ---------- web app entry points ---------- */
+function doGet(e) {
+  return run_(function () {
+    const p = (e &amp;&amp; e.parameter) || {};
+    checkKey_(p.key);
+    const action = p.action || 'ping';
+    if (action === 'ping') return ping_();
+    if (action === 'list') return list_();
+    throw new Error('Unknown action: ' + action);
+  });
+}
+
+function doPost(e) {
+  return run_(function () {
+    const body = JSON.parse((e &amp;&amp; e.postData &amp;&amp; e.postData.contents) || '{}');
+    checkKey_(body.key);
+    const action = body.action || 'save';
+    if (action === 'delete') return deleteWorker_(body.id);
+    if (action === 'saveModules') return saveModules_(body);
+    if (action === 'save') return saveWorker_(body);
+    throw new Error('Unknown action: ' + action);
+  });
+}
+
+/* Run once in the editor: creates the Sheet + Folder and asks for permissions */
+function setup() {
+  const ss = getSpreadsheet_();
+  getSheet_();
+  const folder = getFolder_();
+  Logger.log('Google Sheet : ' + ss.getUrl());
+  Logger.log('Drive Folder : ' + folder.getUrl());
+  Logger.log('Setup complete. Now go to Deploy &gt; New deployment &gt; Web app.');
+}
+
+/* ---------- helpers ---------- */
+function run_(fn) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    return json_(fn());
+  } catch (err) {
+    return json_({ status: 'error', message: String((err &amp;&amp; err.message) || err) });
+  } finally {
+    try { lock.releaseLock(); } catch (x) {}
+  }
+}
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+function checkKey_(key) {
+  if (ACCESS_KEY &amp;&amp; String(key || '') !== ACCESS_KEY) throw new Error('Invalid access key');
+}
+function props_() { return PropertiesService.getScriptProperties(); }
+
+function getSpreadsheet_() {
+  const p = props_();
+  const id = p.getProperty('SHEET_ID');
+  if (id) { try { return SpreadsheetApp.openById(id); } catch (e) {} }
+  let ss = null;
+  try { ss = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
+  if (!ss) ss = SpreadsheetApp.create(SHEET_TITLE);
+  p.setProperty('SHEET_ID', ss.getId());
+  return ss;
+}
+function getFolder_() {
+  const p = props_();
+  const id = p.getProperty('FOLDER_ID');
+  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
+  const f = DriveApp.createFolder(FOLDER_TITLE);
+  p.setProperty('FOLDER_ID', f.getId());
+  return f;
+}
+function getSheet_() {
+  const ss = getSpreadsheet_();
+  let sh = ss.getSheetByName(WORKERS_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(WORKERS_SHEET);
+    const def = ss.getSheetByName('Sheet1');
+    if (def &amp;&amp; ss.getSheets().length &gt; 1 &amp;&amp; def.getLastRow() === 0) ss.deleteSheet(def);
+  }
+  return sh;
+}
+function getModules_() {
+  const raw = props_().getProperty('MODULES_JSON');
+  let names = null;
+  try { names = raw ? JSON.parse(raw) : null; } catch (e) {}
+  return { names: Array.isArray(names) ? names : null, ts: Number(props_().getProperty('MODULES_TS')) || 0 };
+}
+
+/* header row = fixed columns + one column per training module */
+function ensureHeader_(sh, names) {
+  const headers = FIXED_HEADERS.concat(names);
+  if (sh.getMaxColumns() &lt; headers.length) sh.insertColumnsAfter(sh.getMaxColumns(), headers.length - sh.getMaxColumns());
+  const width = Math.min(sh.getMaxColumns(), Math.max(headers.length, sh.getLastColumn()));
+  const cur = sh.getRange(1, 1, 1, width).getValues()[0];
+  let same = true;
+  for (let i = 0; i &lt; width; i++) {
+    const want = i &lt; headers.length ? headers[i] : '';
+    if (String(cur[i] == null ? '' : cur[i]) !== want) { same = false; break; }
+  }
+  if (same) return;
+  if (width &gt; headers.length) {
+    sh.getRange(1, headers.length + 1, sh.getMaxRows(), width - headers.length).clearContent();
+  }
+  const r = sh.getRange(1, 1, 1, headers.length);
+  r.setNumberFormat('@');
+  r.setValues([headers]);
+  r.setFontWeight('bold');
+  r.setBackground('#0b2540');
+  r.setFontColor('#ffffff');
+  sh.setFrozenRows(1);
+  sh.setFrozenColumns(3);
+  try { sh.hideColumns(9); sh.hideColumns(13); } catch (e) {}
+}
+
+function findRow_(sh, id) {
+  const last = sh.getLastRow();
+  if (last &lt; 2) return -1;
+  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = 0; i &lt; ids.length; i++) if (String(ids[i][0]) === String(id)) return i + 2;
+  return -1;
+}
+function cellText_(t) {
+  if (!t || (!t.date &amp;&amp; !t.trainer &amp;&amp; !t.trainerSign &amp;&amp; !t.workerSign)) return '';
+  return (t.date || '-') + ' | ' + (t.trainer || '-') + ' | Trainer ' + (t.trainerSign ? 'OK' : 'X') + ' | Worker ' + (t.workerSign ? 'OK' : 'X');
+}
+
+function savePhoto_(w, oldFileId) {
+  const m = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(w.photo || '');
+  if (!m) return null;
+  const safe = String((w.clims || '') + '_' + (w.name || w.id)).replace(/[^\w\-]+/g, '_').slice(0, 80);
+  const blob = Utilities.newBlob(Utilities.base64Decode(m[2]), m[1], safe + '.jpg');
+  const file = getFolder_().createFile(blob);
+  if (PUBLIC_PHOTOS) file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  if (oldFileId) { try { DriveApp.getFileById(oldFileId).setTrashed(true); } catch (e) {} }
+  const fid = file.getId();
+  return { fileId: fid, url: 'https://drive.google.com/thumbnail?id=' + fid + '&amp;sz=w600' };
+}
+
+/* ---------- actions ---------- */
+function ping_() {
+  const sh = getSheet_();
+  ensureHeader_(sh, getModules_().names || []);
+  return {
+    status: 'success', message: 'pong',
+    sheetUrl: getSpreadsheet_().getUrl(),
+    folderUrl: getFolder_().getUrl(),
+    workers: Math.max(0, sh.getLastRow() - 1)
+  };
+}
+
+function list_() {
+  const sh = getSheet_();
+  const last = sh.getLastRow();
+  const data = [];
+  if (last &gt;= 2) {
+    sh.getRange(2, 1, last - 1, FIXED).getValues().forEach(function (r) {
+      if (!r[0]) return;
+      let trainings = [];
+      try { trainings = JSON.parse(r[12] || '[]'); } catch (e) {}
+      data.push({
+        id: String(r[0]), folder: String(r[1]), name: String(r[2]), clims: String(r[3]),
+        grade: String(r[4]), agency: String(r[5]), area: String(r[6]),
+        photoUrl: String(r[7]), updatedAt: Number(r[9]) || 0, trainings: trainings
+      });
+    });
+  }
+  const m = getModules_();
+  return { status: 'success', data: data, modules: m.names, modulesUpdatedAt: m.ts };
+}
+
+function saveWorker_(w) {
+  if (!w || !w.id) throw new Error('Worker id missing');
+  const sh = getSheet_();
+  const stored = getModules_();
+  const names = stored.names || (Array.isArray(w.moduleNames) ? w.moduleNames : []);
+  ensureHeader_(sh, names);
+
+  let row = findRow_(sh, w.id);
+  let photoUrl = w.photoUrl || '', fileId = '';
+  if (row &gt; 0) {
+    const cur = sh.getRange(row, 8, 1, 2).getValues()[0];
+    photoUrl = String(cur[0] || photoUrl);
+    fileId = String(cur[1] || '');
+  }
+  if (w.photo &amp;&amp; /^data:image\//.test(w.photo)) {
+    const up = savePhoto_(w, fileId);
+    if (up) { photoUrl = up.url; fileId = up.fileId; }
+  }
+
+  const trainings = Array.isArray(w.trainings) ? w.trainings : [];
+  const total = names.length || trainings.length;
+  const done = trainings.filter(function (t) { return t &amp;&amp; t.date &amp;&amp; t.trainerSign &amp;&amp; t.workerSign; }).length;
+  const updatedAt = Number(w.updatedAt) || Date.now();
+  const readable = Utilities.formatDate(new Date(updatedAt), Session.getScriptTimeZone(), 'dd-MMM-yyyy HH:mm');
+  const cells = names.map(function (n, i) { return cellText_(trainings[i]); });
+  const vals = [w.id, w.folder || '', w.name || '', w.clims || '', w.grade || '', w.agency || '', w.area || '',
+    photoUrl, fileId, String(updatedAt), done + ' of ' + total, readable, JSON.stringify(trainings)].concat(cells);
+
+  if (row &lt; 0) row = Math.max(2, sh.getLastRow() + 1);
+  const rng = sh.getRange(row, 1, 1, vals.length);
+  rng.setNumberFormat('@');          // plain text: no value will be treated as a formula
+  rng.setValues([vals.map(String)]);
+  return { status: 'success', id: w.id, driveUrl: photoUrl, row: row };
+}
+
+function deleteWorker_(id) {
+  if (!id) throw new Error('Worker id missing');
+  const sh = getSheet_();
+  const row = findRow_(sh, id);
+  if (row &gt; 0) {
+    const fileId = String(sh.getRange(row, 9).getValue() || '');
+    sh.deleteRow(row);
+    if (fileId) { try { DriveApp.getFileById(fileId).setTrashed(true); } catch (e) {} }
+  }
+  return { status: 'success', id: id, deleted: row &gt; 0 };
+}
+
+function saveModules_(b) {
+  const names = b.modules;
+  if (!Array.isArray(names) || !names.length || names.length &gt; 200) throw new Error('Invalid modules list');
+  const clean = names.map(function (n) { return String(n); });
+  const ts = Number(b.updatedAt) || Date.now();
+  const cur = getModules_();
+  if (cur.names &amp;&amp; ts &lt; cur.ts) {
+    return { status: 'success', ignored: true, modules: cur.names, modulesUpdatedAt: cur.ts };
+  }
+  props_().setProperty('MODULES_JSON', JSON.stringify(clean));
+  props_().setProperty('MODULES_TS', String(ts));
+  ensureHeader_(getSheet_(), clean);
+  return { status: 'success', modules: clean, modulesUpdatedAt: ts };
+}
+</textarea>
+    </div>
+
+    <div class="card">
+      <h2>How it works</h2>
+      <div class="hint" style="margin-bottom:0;">
+        <b>Google Sheet:</b> each worker gets one row (name, CLIMS ID, folder, grade, agency, area, modules completed) plus a separate column for every training module — with date, trainer and sign.<br>
+        <b>Google Drive:</b> worker photos are saved in the <i>Safety Training Photos</i> folder. By default the photo link is viewable by anyone with the link, so photos show on other devices. To keep photos private, set <code>PUBLIC_PHOTOS = false</code> in Code.gs (photos will then show only on the device where they were uploaded).<br>
+        <b>Auto sync:</b> cards are sent to the cloud as soon as you save/delete them; sync also runs when the page opens, when the internet returns, and every 3 minutes. If you are offline, data stays safe in this browser and uploads automatically later.<br>
+        <b>Training modules:</b> the module list is also saved in the cloud, so changing modules on one device updates the others.<br>
+        <b>Note:</b> only <u>deleting a row</u> in the Sheet is reflected on the website. To change data, edit it on the website (the training columns in the Sheet are view-only).
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="printArea" style="display:none;">
+  <div class="pt-card">
+    <div class="pt-stripe"></div>
+    <div class="pt-header">
+      <div class="pt-header-icon">🦺</div>
+      <div>
+        <p class="pt-title">Safety Training Card</p>
+        <div class="pt-subtitle pt-hide-print">Worker Safety Training Record &nbsp;•&nbsp; <span id="pFolder"></span></div>
+      </div>
+    </div>
+    <div class="pt-info-wrap">
+      <div class="pt-photo-col">
+        <img id="pPhoto" src="" alt="Worker photo">
+        <div class="pt-photo-placeholder" id="pPhotoPlaceholder">Worker Photo</div>
+      </div>
+      <div class="pt-info-grid">
+        <div class="pt-field pt-field-name">
+          <span class="pt-label">Name of Worker</span>
+          <span class="pt-value" id="pName"></span>
+        </div>
+        <div class="pt-field-row">
+          <div class="pt-field"><span class="pt-label">CLIMS ID</span><span class="pt-value" id="pClims"></span></div>
+          <div class="pt-field"><span class="pt-label">Grade</span><span class="pt-value" id="pGrade"></span></div>
+        </div>
+        <div class="pt-field-row">
+          <div class="pt-field"><span class="pt-label">Name of Agency</span><span class="pt-value" id="pAgency"></span></div>
+          <div class="pt-field"><span class="pt-label">Work Area</span><span class="pt-value" id="pArea"></span></div>
+        </div>
+      </div>
+    </div>
+    <table class="pt-modules">
+      <thead><tr><th>S.N</th><th>Training Module Name</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th></tr></thead>
+      <tbody id="pModules"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const DEFAULT_MODULES = [
+"Induction Training","Use of PPE","Fire Safety",
+"Electrical Safety","Work at Height","Basics of PTW System",
+"Manual Handling","Hand Tools","Slips-Trips Falls",
+"General Safety Including Hygiene","Caught-By/Caught-in",
+"Road Safety","Material Handling","Safety & Hygiene of Office",
+"Hazardous Chemicals","Work Near Water","Heavy Vehicle Safety",
+"First Aid","Struck by, Run Over Hazards","Basics of Ergonomics",
+"Caught-by/in/-in between Hazards","Power Tools","Hot Work",
+"Work in Confined Spaces","Basics of Safety Rules & PTW System"
+];
+const MODULES_KEY = "safety_training_modules_v1";
+function cleanModuleName(n){return String(n).replace(/\s*\/\s*[^\/]*[\u0900-\u097F][^\/]*$/,'').trim();}
+function loadModules(){try{const r=JSON.parse(localStorage.getItem(MODULES_KEY)||'null');if(Array.isArray(r)&&r.length&&r.every(x=>typeof x==='string'))return r.map(cleanModuleName);}catch(e){}return DEFAULT_MODULES.slice();}
+const MODULES_TS_KEY = "safety_training_modules_ts_v1";
+let modulesTs=0;try{modulesTs=Number(localStorage.getItem(MODULES_TS_KEY))||0;}catch(e){}
+function saveModules(ts){modulesTs=ts||Date.now();try{localStorage.setItem(MODULES_KEY,JSON.stringify(MODULES));localStorage.setItem(MODULES_TS_KEY,String(modulesTs));}catch(e){}}
+let MODULES = loadModules();
+const STORAGE_KEY = "safety_training_cards_v1";
+const FOLDERS_KEY="safety_training_folders_v1";
+const FOLDERS=(()=>{try{const r=JSON.parse(localStorage.getItem(FOLDERS_KEY)||'null');if(Array.isArray(r)&&r.length&&r.every(x=>typeof x==='string'&&x.trim()))return r;}catch(e){}return ["EMD Lighting","EMD Cable"];})();
+function saveFolders(){try{localStorage.setItem(FOLDERS_KEY,JSON.stringify(FOLDERS));}catch(e){}}
+let activeFolder = '';
+let workers = []; let editingId = null; let currentPhotoData = '';
+
+function uid(){return 'w_'+Date.now()+'_'+Math.floor(Math.random()*10000);}
+function blankTrainings(){return MODULES.map(()=>({date:'',trainer:'',trainerSign:false,workerSign:false}));}
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(workers));return true;}catch(e){toast('⚠ Browser storage full! Data was not saved. Use smaller photos or remove old records.',5000);return false;}}
+function normalizeTrainings(){workers.forEach(w=>{if(!Array.isArray(w.trainings))w.trainings=[];while(w.trainings.length<MODULES.length)w.trainings.push({date:'',trainer:'',trainerSign:false,workerSign:false});if(w.trainings.length>MODULES.length)w.trainings=w.trainings.slice(0,MODULES.length);});}
+function load(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)workers=JSON.parse(r);}catch(e){}normalizeTrainings();}
+function escapeHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+let toastTimer=null;
+function toast(m,ms){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),ms||2400);}
+
+// Populate module dropdown
+const advModuleSel = document.getElementById('advModule');
+function populateAdvModule(){
+  advModuleSel.innerHTML='<option value="">Any</option>';
+  MODULES.forEach((m,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=(i+1)+'. '+m.trim();advModuleSel.appendChild(o);});
+  document.getElementById('optComplete').textContent='Complete ('+MODULES.length+'/'+MODULES.length+')';
+  document.getElementById('advMinDone').placeholder='0-'+MODULES.length;
+}
+
+function rebuildFolderSelects(){
+  const targets=[['advFolder','Any'],['filterFolder','All Folders'],['fFolder',null]];
+  targets.forEach(([id,first])=>{
+    const sel=document.getElementById(id);const cur=sel.value;
+    sel.innerHTML=first!==null?`<option value="">${first}</option>`:'';
+    FOLDERS.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
+    if(cur&&FOLDERS.includes(cur))sel.value=cur;
+  });
+}
+function syncFolders(){
+  let changed=false;
+  workers.forEach(w=>{const f=String(w.folder||'').trim();if(f&&!FOLDERS.includes(f)){FOLDERS.push(f);changed=true;}});
+  if(changed){saveFolders();rebuildFolderSelects();}
+}
+rebuildFolderSelects();
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(btn.dataset.panel==='panelNew'&&!isAdmin&&!document.getElementById('panelNew').classList.contains('active')){requireAdmin(()=>btn.click(),'Enter the admin password to add a new worker.');return;}
+    if(document.getElementById('panelModules').classList.contains('active')&&modDirty()&&!confirm('Module changes are not saved. Leave without saving?'))return;
+    if(document.getElementById('panelNew').classList.contains('active')&&isFormDirty()&&!confirm('This card has unsaved changes. Leave without saving?'))return;
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(btn.dataset.panel).classList.add('active');
+    if(btn.dataset.panel==='panelNew')resetForm();
+    if(btn.dataset.panel==='panelList')renderTable();
+    if(btn.dataset.panel==='panelDashboard')renderDashboard();
+    if(btn.dataset.panel==='panelModules')startModuleManager();
+  });
+});
+function goTo(id){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));const n=document.querySelector(`.nav-btn[data-panel="${id}"]`);if(n)n.classList.add('active');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function buildModuleRows(trainings){
+  const tb=document.getElementById('moduleTableBody');tb.innerHTML='';
+  const sw=editingId?workers.find(x=>x.id===editingId):null;
+  cardDraft.forEach((m,i)=>{
+    const t=(trainings&&trainings[i])||{date:'',trainer:'',trainerSign:false,workerSign:false};
+    const sv=(sw&&m.orig!=null&&sw.trainings[m.orig])||{};   // lock only values that are already SAVED
+    const tr=document.createElement('tr');tr.dataset.i=i;
+    tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(m.name)}${m.orig==null?' <span class="badge badge-partial">New</span>':''}</td>
+      <td><input type="date" class="mDate" value="${escapeHtml(t.date||'')}"${sv.date?' data-locked="1"':''}></td>
+      <td><input type="text" class="mTrainer" value="${escapeHtml(t.trainer||'')}" ${sv.trainer?' data-locked="1"':''}></td>
+      <td style="text-align:center"><span class="sign-toggle ${t.trainerSign?'is-done':''}" data-role="trainer" data-signed="${t.trainerSign?'1':'0'}"${sv.trainerSign?' data-locked="1"':''}>${t.trainerSign?'✔':''}</span></td>
+      <td style="text-align:center"><span class="sign-toggle ${t.workerSign?'is-done':''}" data-role="worker" data-signed="${t.workerSign?'1':'0'}"${sv.workerSign?' data-locked="1"':''}>${t.workerSign?'✔':''}</span></td>
+      <td style="text-align:center"><div style="display:flex;flex-direction:column;gap:5px;align-items:stretch"><button type="button" class="btn btn-outline btn-sm" data-act="editModule" title="Edit this module's name (Admin, applied on Save)">✎ Edit Module</button><button type="button" class="btn btn-outline btn-sm" data-act="removeModule" title="Remove this whole module from the list (Admin, applied on Save)">✖ Remove Module</button></div></td>`;
+    tb.appendChild(tr);
+  });
+  refreshLocks();refreshDateEmpty();
+}
+function refreshDateEmpty(){document.querySelectorAll('#moduleTableBody .mDate').forEach(el=>el.classList.toggle('is-empty',!el.value));}
+document.getElementById('moduleTableBody').addEventListener('input',refreshDateEmpty);
+document.getElementById('moduleTableBody').addEventListener('change',refreshDateEmpty);
+/* Admin lock: values that were already SAVED cannot be changed / un-signed without Admin login */
+function refreshLocks(){
+  let adm=false;try{adm=isAdmin;}catch(e){}
+  document.querySelectorAll('#moduleTableBody input[data-locked="1"]').forEach(el=>{el.readOnly=!adm;el.title=adm?'':'🔒 Saved record — Admin login required to change';});
+}
+function rowHasData(tr){
+  return !!(tr.querySelector('.mDate').value||tr.querySelector('.mTrainer').value.trim()||
+    tr.querySelector('[data-role="trainer"]').dataset.signed==='1'||tr.querySelector('[data-role="worker"]').dataset.signed==='1');
+}
+document.getElementById('moduleTableBody').addEventListener('click',e=>{
+  const cb=e.target.closest('button[data-act="clearRow"]');
+  if(cb){
+    if(cb.disabled)return;
+    const tr=cb.closest('tr');
+    requireAdmin(()=>{
+      const name=(cardDraft[+tr.dataset.i]||{}).name||'';
+      if(!confirm('Delete the record for "'+name.trim()+'"  (date, trainer, signs)?\n\n'+'(It becomes final only after you click Save / Update Card)'))return;
+      tr.querySelector('.mDate').value='';
+      tr.querySelector('.mTrainer').value='';
+      tr.querySelectorAll('.sign-toggle').forEach(el=>{el.dataset.signed='0';el.textContent='';el.classList.remove('is-done');});
+      tr.querySelectorAll('[data-locked]').forEach(el=>{el.removeAttribute('data-locked');el.readOnly=false;el.title='';});
+      refreshDateEmpty();
+      markPendingChange();
+      toast('🗑 Record cleared — NOT saved yet. Click Save / Update Card to save');
+    },'Enter the admin password to delete this module record.');
+    return;
+  }
+  const lk=e.target.closest('input[data-locked="1"]');
+  if(lk&&lk.readOnly&&!lk.disabled&&!isAdmin){requireAdmin(refreshLocks,'This module record is already saved. Enter the admin password to change it.');return;}
+  const el=e.target.closest('.sign-toggle');
+  if(!el||el.classList.contains('readonly'))return;
+  const signed=el.dataset.signed==='1';
+  if(signed&&el.dataset.locked==='1'&&!isAdmin){requireAdmin(refreshLocks,'This sign is already saved. Enter the admin password to remove it.');return;}
+  el.dataset.signed=signed?'0':'1';
+  el.textContent=signed?'':'✔';
+  el.classList.toggle('is-done',!signed);
+});
+function collectTrainings(){
+  const d=document.querySelectorAll('.mDate'),tr=document.querySelectorAll('.mTrainer'),
+        ts=document.querySelectorAll('.sign-toggle[data-role="trainer"]'),ws=document.querySelectorAll('.sign-toggle[data-role="worker"]');
+  const r=[];for(let i=0;i<d.length;i++)r.push({date:d[i].value,trainer:tr[i].value,trainerSign:ts[i].dataset.signed==='1',workerSign:ws[i].dataset.signed==='1'});
+  return r;
+}
+function resizeImage(dataUrl,maxDim,cb){
+  const img=new Image();
+  img.onload=()=>{
+    try{
+      const sc=Math.min(1,maxDim/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));
+      const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);
+      cb(c.toDataURL('image/jpeg',0.85));
+    }catch(err){cb(dataUrl);}
+  };
+  img.onerror=()=>cb(dataUrl);
+  img.src=dataUrl;
+}
+document.getElementById('photoInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(!/^image\//.test(f.type)){toast('⚠ Please select an image file only');e.target.value='';return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    resizeImage(ev.target.result,600,small=>{
+      currentPhotoData=small;
+      document.getElementById('photoBox').innerHTML=`<img src="${small}">`;
+    });
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+});
+let formBaseline='';
+function formSnapshot(){
+  return JSON.stringify([document.getElementById('fFolder').value,document.getElementById('fName').value,document.getElementById('fClims').value,
+    document.getElementById('fGrade').value,document.getElementById('fAgency').value,document.getElementById('fArea').value,
+    currentPhotoData.length,currentPhotoData.slice(-30),collectTrainings(),cardDraft.map(m=>[m.name,m.orig])]);
+}
+function isFormDirty(){return formSnapshot()!==formBaseline;}
+let formViewMode=false;
+function setFormReadOnly(ro){
+  formViewMode=ro;
+  document.querySelectorAll('#panelNew input, #panelNew select').forEach(el=>{el.disabled=ro;});
+  document.getElementById('photoBox').style.pointerEvents=ro?'none':'auto';
+  document.getElementById('photoBox').style.opacity=ro?'0.7':'1';
+  document.querySelectorAll('#moduleTableBody .sign-toggle').forEach(el=>{el.classList.toggle('readonly',ro);});
+  document.querySelectorAll('#moduleTableBody button[data-act="clearRow"]').forEach(b=>{b.disabled=false;}); // Delete button also works in a saved (view) card
+  // mode banner + buttons
+  const mode=ro?'view':(editingId?'edit':'new');
+  const w=editingId?workers.find(x=>x.id===editingId):null;
+  const who=w?escapeHtml(w.name)+' ('+escapeHtml(w.clims)+')':'';
+  const banner=document.getElementById('modeBanner');
+  banner.className='mode-banner mode-'+mode;
+  banner.innerHTML=mode==='new'?'🆕 New worker card — fill in the details and click <b>Save Card</b>.'
+    :mode==='edit'?'✏ Edit mode: <b>'+who+'</b> — make your changes and click <b>Update Card</b>.'
+    :'👁 View mode: <b>'+who+'</b> — read only. Click <b>Edit This Card</b> to make changes.';
+  const sb=document.getElementById('saveWorkerBtn');
+  sb.style.display=(!ro||viewPending)?'inline-block':'none';
+  sb.textContent=editingId?'💾 Update Card':'💾 Save Card';
+  document.getElementById('saveStayBtn').style.display=(!ro&&editingId)?'inline-block':'none';
+  document.getElementById('editFromViewBtn').style.display=ro?'inline-block':'none';
+  document.getElementById('cancelFormBtn').textContent=ro?'Close':'Cancel';
+}
+function resetForm(){
+  editingId=null;
+  document.getElementById('formTitle').innerHTML='New Worker Training Card';
+  ['fName','fClims','fGrade','fAgency','fArea','workerId'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fFolder').value=activeFolder||FOLDERS[0];
+  currentPhotoData='';
+  document.getElementById('photoBox').innerHTML='📷 Click to Add Worker Photo';
+  document.getElementById('printFromFormBtn').style.display='none';
+  freshDraft();viewPending=false;
+  buildModuleRows(blankTrainings());
+  setFormReadOnly(false);
+  formBaseline=formSnapshot();
+}
+document.getElementById('cancelFormBtn').addEventListener('click',()=>{
+  if(isFormDirty()&&!confirm('This card has unsaved changes. Leave without saving?'))return;
+  resetForm();goTo('panelList');
+});
+document.getElementById('editFromViewBtn').addEventListener('click',()=>{if(editingId){const id=editingId;requireAdmin(()=>editWorker(id,false),'Enter the admin password to edit this worker card.');}});
+function saveCard(stay,keepView){
+  if(!editingId&&!isAdmin){requireAdmin(()=>saveCard(stay,keepView),'Enter the admin password to save a new worker.');return;}
+  const name=document.getElementById('fName').value.trim();
+  const clims=document.getElementById('fClims').value.trim();
+  if(!name||!clims){toast('⚠ Name and CLIMS ID are required');return;}
+  if(workers.some(w=>w.id!==editingId&&String(w.clims||'').trim().toLowerCase()===clims.toLowerCase())){toast('⚠ This CLIMS ID already exists ('+clims+')',3500);return;}
+  if(draftChanged()){commitCardModules(()=>saveCard(stay,keepView));return;}
+  let data={id:editingId||uid(),name,clims,
+    folder:document.getElementById('fFolder').value,
+    grade:document.getElementById('fGrade').value.trim(),
+    agency:document.getElementById('fAgency').value.trim(),
+    area:document.getElementById('fArea').value.trim(),
+    photo:currentPhotoData,trainings:collectTrainings(),updatedAt:Date.now()};
+  if(editingId){
+    const i=workers.findIndex(w=>w.id===editingId);
+    if(i===-1){toast('⚠ This card no longer exists (it was deleted)');return;}
+    const prevPhoto=workers[i].photo||'';
+    const dirty=(!!currentPhotoData&&currentPhotoData!==prevPhoto)||!!workers[i].photoDirty;
+    if(!data.photo){data.photo=workers[i].photo;data.photoUrl=workers[i].photoUrl;}
+    data={...workers[i],...data,photoDirty:dirty,synced:false};
+    workers[i]=data;
+  } else {data.photoDirty=!!data.photo;data.synced=false;workers.push(data);}
+  if(!save())return;
+  toast(editingId?'✅ Card updated':'✅ Card saved');
+  syncFolders();renderTable();renderDashboard();
+  if(modulesNeedPush){modulesNeedPush=false;if(getGasUrl())syncModulesAndWorkers();}
+  else pushWorkerToCloud(data);
+  if(stay)editWorker(data.id,!!keepView);
+  else{resetForm();goTo('panelList');}
+}
+document.getElementById('saveWorkerBtn').addEventListener('click',()=>saveCard(false));
+document.getElementById('saveStayBtn').addEventListener('click',()=>saveCard(true));
+window.addEventListener('beforeunload',e=>{
+  if(document.getElementById('panelNew').classList.contains('active')&&isFormDirty()){e.preventDefault();e.returnValue='';}
+});
+
+function trainingStatus(w){
+  const done=w.trainings.filter(t=>t.date&&t.trainerSign&&t.workerSign).length;
+  if(done===0)return{label:'Not Started',cls:'badge-none',done};
+  if(done===MODULES.length)return{label:'Complete',cls:'badge-complete',done};
+  return{label:`${done}/${MODULES.length}`,cls:'badge-partial',done};
+}
+
+function renderDashboard(){
+  const total=workers.length;
+  const complete=workers.filter(w=>trainingStatus(w).done===MODULES.length).length;
+  const none=workers.filter(w=>trainingStatus(w).done===0).length;
+  const partial=total-complete-none;
+  document.getElementById('dashStats').innerHTML=
+    `<div class="stat"><b>${total}</b>Total Workers</div>
+     <div class="stat"><b style="color:var(--success)">${complete}</b>Complete</div>
+     <div class="stat"><b style="color:#8a6d3b">${partial}</b>Partial</div>
+     <div class="stat"><b style="color:var(--danger)">${none}</b>Not Started</div>
+     <div class="stat"><b>${FOLDERS.length}</b>Folders</div>`;
+
+  const fc=document.getElementById('folderCards');fc.innerHTML='';
+  FOLDERS.forEach(f=>{
+    const fw=workers.filter(w=>(w.folder||FOLDERS[0])===f);
+    const fComplete=fw.filter(w=>trainingStatus(w).done===MODULES.length).length;
+    const fNone=fw.filter(w=>trainingStatus(w).done===0).length;
+    const fPartial=fw.length-fComplete-fNone;
+    const div=document.createElement('div');
+    div.className='card';
+    div.style.cursor='pointer';
+    div.style.margin='0';
+    div.innerHTML=`<h2 style="margin-top:0">📁 ${escapeHtml(f)}</h2>
+      <div class="stats">
+        <div class="stat"><b>${fw.length}</b>Workers</div>
+        <div class="stat"><b style="color:var(--success)">${fComplete}</b>Complete</div>
+        <div class="stat"><b style="color:#8a6d3b">${fPartial}</b>Partial</div>
+        <div class="stat"><b style="color:var(--danger)">${fNone}</b>Not Started</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" data-act="open">Open Folder</button>
+        <button class="btn btn-success btn-sm" data-act="printAll" ${fw.length?'':'disabled'}>🖨 Print All (${fw.length})</button>
+        <button class="btn btn-danger btn-sm" data-act="delFolder">🗑 Delete Folder</button>
+      </div>`;
+    div.querySelector('[data-act="open"]').addEventListener('click',()=>{
+      activeFolder=f;
+      document.getElementById('filterFolder').value=f;
+      goTo('panelList');
+      renderTable();
+    });
+    const pAll=div.querySelector('[data-act="printAll"]');
+    if(pAll) pAll.addEventListener('click',(e)=>{e.stopPropagation();printFolder(f);});
+    div.querySelector('[data-act="delFolder"]').addEventListener('click',(e)=>{e.stopPropagation();deleteFolder(f);});
+    fc.appendChild(div);
+  });
+}
+
+function renderTable(){
+  const tb=document.getElementById('workerTableBody');tb.innerHTML='';
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const fFolder=document.getElementById('filterFolder').value;
+  const fs=document.getElementById('filterStatus').value;
+  const aFolder=document.getElementById('advFolder').value;
+  const aName=document.getElementById('advName').value.trim().toLowerCase();
+  const aClims=document.getElementById('advClims').value.trim().toLowerCase();
+  const aGrade=document.getElementById('advGrade').value.trim().toLowerCase();
+  const aAgency=document.getElementById('advAgency').value.trim().toLowerCase();
+  const aArea=document.getElementById('advArea').value.trim().toLowerCase();
+  const aTrainer=document.getElementById('advTrainer').value.trim().toLowerCase();
+  const aModule=document.getElementById('advModule').value;
+  const aFrom=document.getElementById('advDateFrom').value;
+  const aTo=document.getElementById('advDateTo').value;
+  const aMin=parseInt(document.getElementById('advMinDone').value)||0;
+  const aPhoto=document.getElementById('advPhoto').value;
+  const aSort=document.getElementById('advSort').value;
+
+  let list=workers.filter(w=>{
+    const wFolder=w.folder||FOLDERS[0];
+    if(fFolder&&wFolder!==fFolder)return false;
+    if(aFolder&&wFolder!==aFolder)return false;
+    if(q){
+      const blob=((w.name||'')+' '+(w.clims||'')+' '+wFolder+' '+(w.grade||'')+' '+(w.agency||'')+' '+(w.area||'')+' '+w.trainings.map(t=>t.trainer).join(' ')).toLowerCase();
+      if(!blob.includes(q))return false;
+    }
+    if(aName&&!(w.name||'').toLowerCase().includes(aName))return false;
+    if(aClims&&!(w.clims||'').toLowerCase().includes(aClims))return false;
+    if(aGrade&&!(w.grade||'').toLowerCase().includes(aGrade))return false;
+    if(aAgency&&!(w.agency||'').toLowerCase().includes(aAgency))return false;
+    if(aArea&&!(w.area||'').toLowerCase().includes(aArea))return false;
+    if(aTrainer&&!w.trainings.some(t=>(t.trainer||'').toLowerCase().includes(aTrainer)))return false;
+    if(aModule!==''){const t=w.trainings[+aModule];if(!t||!t.date)return false;}
+    if((aFrom||aTo)&&!w.trainings.some(t=>t.date&&(!aFrom||t.date>=aFrom)&&(!aTo||t.date<=aTo)))return false;
+    if(aMin>0&&trainingStatus(w).done<aMin)return false;
+    if(aPhoto==='yes'&&!w.photo)return false;
+    if(aPhoto==='no'&&w.photo)return false;
+    if(fs){const d=trainingStatus(w).done;
+      if(fs==='complete'&&d!==MODULES.length)return false;
+      if(fs==='partial'&&(d===0||d===MODULES.length))return false;
+      if(fs==='none'&&d!==0)return false;}
+    return true;
+  });
+
+  list.sort((a,b)=>{
+    if(aSort==='name')return (a.name||'').localeCompare(b.name||'');
+    if(aSort==='name_desc')return (b.name||'').localeCompare(a.name||'');
+    if(aSort==='clims')return (a.clims||'').localeCompare(b.clims||'');
+    if(aSort==='progress_desc')return trainingStatus(b).done-trainingStatus(a).done;
+    if(aSort==='progress_asc')return trainingStatus(a).done-trainingStatus(b).done;
+    return 0;
+  });
+
+  // stats
+  const total=workers.length;
+  const complete=workers.filter(w=>trainingStatus(w).done===MODULES.length).length;
+  const none=workers.filter(w=>trainingStatus(w).done===0).length;
+  const partial=total-complete-none;
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><b>${total}</b>Total</div>
+     <div class="stat"><b style="color:var(--success)">${complete}</b>Complete</div>
+     <div class="stat"><b style="color:#8a6d3b">${partial}</b>Partial</div>
+     <div class="stat"><b style="color:var(--danger)">${none}</b>Not Started</div>
+     <div class="stat"><b>${list.length}</b>Showing</div>`;
+  document.getElementById('emptyState').style.display=total===0?'block':'none';
+
+  list.forEach(w=>{
+    const st=trainingStatus(w);
+    const tr=document.createElement('tr');
+    const thumb=w.photo||w.photoUrl;
+    const wid=escapeHtml(w.id);
+    tr.innerHTML=`<td>${thumb?`<img loading="lazy" decoding="async" src="${escapeHtml(thumb)}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`:'—'}</td>
+      <td>${escapeHtml(w.name)}</td><td>${escapeHtml(w.clims)}</td>
+      <td>${escapeHtml(w.folder||FOLDERS[0])}</td>
+      <td>${escapeHtml(w.grade||'-')}</td><td>${escapeHtml(w.agency||'-')}</td><td>${escapeHtml(w.area||'-')}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span><div class="mini-bar"><i style="width:${Math.round(st.done/Math.max(1,MODULES.length)*100)}%"></i></div></td>
+      <td><div class="row-actions">
+        <button class="btn btn-outline btn-sm" data-act="view" data-id="${wid}">View</button>
+        <button class="btn btn-primary btn-sm" data-act="edit" data-id="${wid}">Edit</button>
+        <button class="btn btn-success btn-sm" data-act="print" data-id="${wid}">Print</button>
+        <button class="btn btn-danger btn-sm" data-act="delete" data-id="${wid}">Delete</button>
+      </div></td>`;
+    tb.appendChild(tr);
+  });
+  if(total>0&&list.length===0){
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="9" class="empty-state" style="padding:26px 10px">No matching workers found. Try clearing the filters / search.</td>';
+    tb.appendChild(tr);
+  }
+}
+document.getElementById('workerTableBody').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]');if(!b)return;
+  const id=b.dataset.id;
+  if(b.dataset.act==='view')viewWorker(id);
+  else if(b.dataset.act==='edit')requireAdmin(()=>editWorker(id),'Enter the admin password to edit this worker card.');
+  else if(b.dataset.act==='print')printWorker(id);
+  else if(b.dataset.act==='delete')deleteWorker(id);
+});
+
+['searchInput','filterFolder','filterStatus','advFolder','advName','advClims','advGrade','advAgency','advArea','advTrainer','advModule','advDateFrom','advDateTo','advMinDone','advPhoto','advSort'].forEach(id=>{
+  const el=document.getElementById(id);el.addEventListener('input',renderTable);el.addEventListener('change',renderTable);
+});
+document.getElementById('toggleAdv').addEventListener('click',()=>{
+  const a=document.getElementById('advSearch');a.style.display=a.style.display==='none'?'block':'none';
+});
+document.getElementById('clearSearch').addEventListener('click',()=>{
+  activeFolder='';
+  ['searchInput','advName','advClims','advGrade','advAgency','advArea','advTrainer','advDateFrom','advDateTo','advMinDone'].forEach(id=>document.getElementById(id).value='');
+  ['filterFolder','filterStatus','advFolder','advModule','advPhoto'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('advSort').value='name';
+  renderTable();
+});
+
+document.getElementById('exportCsvBtn').addEventListener('click',()=>{
+  if(!workers.length){toast('No worker records to export');return;}
+  const q=v=>{v=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"';};
+  const head=['Name','CLIMS ID','Folder','Grade','Agency','Work Area','Modules Completed'];
+  MODULES.forEach(m=>head.push(m+' - Date',m+' - Trainer',m+' - Trainer Sign',m+' - Worker Sign'));
+  const rows=workers.map(w=>{
+    const r=[w.name,w.clims,w.folder||FOLDERS[0],w.grade,w.agency,w.area,trainingStatus(w).done+'/'+MODULES.length];
+    MODULES.forEach((m,i)=>{const t=w.trainings[i]||{};r.push(fmtDate(t.date),t.trainer,t.trainerSign?'Yes':'',t.workerSign?'Yes':'');});
+    return r.map(q).join(',');
+  });
+  const blob=new Blob(['\ufeff'+[head.map(q).join(',')].concat(rows).join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Safety_Training_Cards.csv';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('⬇ CSV exported');
+});
+function viewWorker(id){editWorker(id,true);}
+function editWorker(id,ro=false){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  editingId=id;
+  document.getElementById('formTitle').innerHTML=(ro?'View: ':'Edit: ')+escapeHtml(w.name);
+  document.getElementById('workerId').value=w.id;
+  document.getElementById('fFolder').value=w.folder||FOLDERS[0];
+  document.getElementById('fName').value=w.name;
+  document.getElementById('fClims').value=w.clims;
+  document.getElementById('fGrade').value=w.grade||'';
+  document.getElementById('fAgency').value=w.agency||'';
+  document.getElementById('fArea').value=w.area||'';
+  currentPhotoData=w.photo||'';
+  const editThumb=w.photo||w.photoUrl;
+  document.getElementById('photoBox').innerHTML=editThumb?`<img src="${escapeHtml(editThumb)}">`:'📷 Click to Add Worker Photo';
+  freshDraft();viewPending=false;
+  buildModuleRows(w.trainings);
+  setFormReadOnly(ro);
+  formBaseline=formSnapshot();
+  document.getElementById('printFromFormBtn').style.display='inline-block';
+  document.getElementById('printFromFormBtn').onclick=()=>{if(isFormDirty()&&!confirm('Unsaved changes will NOT appear in the print (saved version prints). Continue?'))return;printWorker(id);};
+  goTo('panelNew');
+}
+const DELETED_KEY="safety_training_cards_deleted_v1";
+function loadDeleted(){try{return new Set(JSON.parse(localStorage.getItem(DELETED_KEY)||"[]"));}catch(e){return new Set();}}
+function saveDeleted(set){try{localStorage.setItem(DELETED_KEY,JSON.stringify([...set]));}catch(e){}}
+let deletedIds=loadDeleted();
+
+function deleteWorker(id){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  requireAdmin(()=>{
+    if(!confirm(`Delete card for "${w.name}"?\n\nThis cannot be undone.`))return;
+    workers=workers.filter(x=>x.id!==id);
+    deletedIds.add(id);saveDeleted(deletedIds);
+    save();renderTable();renderDashboard();toast('🗑 Deleted');
+    deleteWorkerFromCloud(id);
+  },`Enter the admin password to delete the card for "${w.name}".`);
+}
+async function deleteWorkerFromCloud(id){
+  const url=getGasUrl();if(!url)return false;
+  try{
+    const res=await gasFetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'delete',id:id,key:getGasKey()})});
+    const json=await res.json();
+    return !!(json&&json.status==='success');
+  }catch(e){return false;} // offline ok — next sync retries, blacklist prevents re-add
+}
+function printWorker(id){
+  const w=workers.find(x=>x.id===id);if(!w)return;
+  document.getElementById('pFolder').textContent=w.folder||FOLDERS[0];
+  document.getElementById('pName').textContent=w.name;
+  document.getElementById('pClims').textContent=w.clims;
+  document.getElementById('pGrade').textContent=w.grade||'';
+  document.getElementById('pAgency').textContent=w.agency||'';
+  document.getElementById('pArea').textContent=w.area||'';
+  const pImg=document.getElementById('pPhoto');
+  const pPlaceholder=document.getElementById('pPhotoPlaceholder');
+  const photoSrc=w.photo||w.photoUrl||'';
+  if(photoSrc){pImg.src=photoSrc;pImg.style.display='block';pPlaceholder.style.display='none';}
+  else{pImg.removeAttribute('src');pImg.style.display='none';pPlaceholder.style.display='flex';}
+  const tb=document.getElementById('pModules');tb.innerHTML='';
+  MODULES.forEach((m,i)=>{
+    const t=w.trainings[i]||{date:'',trainer:'',trainerSign:false,workerSign:false};
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(m)}</td><td>${escapeHtml(fmtDate(t.date))}</td><td>${escapeHtml(t.trainer||'')}</td>
+      <td style="text-align:center">${t.trainerSign?'✔':''}</td><td style="text-align:center">${t.workerSign?'✔':''}</td>`;
+    tb.appendChild(tr);
+  });
+  const pa=document.getElementById('printArea');
+  pa.style.zoom='1';
+  pa.style.display='block';
+  fitPrintAreaToOnePage();
+  window.print();
+  setTimeout(()=>{pa.style.display='none';pa.style.zoom='1';},500);
+}
+function printFolder(folderName){
+  const list=workers.filter(w=>(w.folder||FOLDERS[0])===folderName);
+  if(!list.length){toast('No workers in this folder');return;}
+  const pa=document.getElementById('printArea');
+  const originalHTML=pa.innerHTML;
+  const originalStyle=pa.getAttribute('style')||'';
+
+  const cardHTML=(w)=>{
+    const photoSrc=w.photo||w.photoUrl||'';
+    const photo=photoSrc
+      ? `<img src="${escapeHtml(photoSrc)}" alt="Worker photo" style="width:104px;height:122px;object-fit:cover;border-radius:9px;border:1.5px solid var(--navy);display:block;">`
+      : `<div class="pt-photo-placeholder">Worker Photo</div>`;
+    const rows=MODULES.map((m,i)=>{
+      const t=w.trainings[i]||{date:'',trainer:'',trainerSign:false,workerSign:false};
+      return `<tr><td>${i+1}</td><td>${escapeHtml(m)}</td><td>${escapeHtml(fmtDate(t.date))}</td><td>${escapeHtml(t.trainer||'')}</td><td style="text-align:center">${t.trainerSign?'✔':''}</td><td style="text-align:center">${t.workerSign?'✔':''}</td></tr>`;
+    }).join('');
+    return `<div class="pt-card-page"><div class="pt-card">
+      <div class="pt-stripe"></div>
+      <div class="pt-header">
+        <div class="pt-header-icon">🦺</div>
+        <div>
+          <p class="pt-title">Safety Training Card</p>
+          <div class="pt-subtitle pt-hide-print">Worker Safety Training Record &nbsp;•&nbsp; ${escapeHtml(w.folder||FOLDERS[0])}</div>
+        </div>
+      </div>
+      <div class="pt-info-wrap">
+        <div class="pt-photo-col">${photo}</div>
+        <div class="pt-info-grid">
+          <div class="pt-field pt-field-name"><span class="pt-label">Name of Worker</span><span class="pt-value">${escapeHtml(w.name||'')}</span></div>
+          <div class="pt-field-row">
+            <div class="pt-field"><span class="pt-label">CLIMS ID</span><span class="pt-value">${escapeHtml(w.clims||'')}</span></div>
+            <div class="pt-field"><span class="pt-label">Grade</span><span class="pt-value">${escapeHtml(w.grade||'')}</span></div>
+          </div>
+          <div class="pt-field-row">
+            <div class="pt-field"><span class="pt-label">Name of Agency</span><span class="pt-value">${escapeHtml(w.agency||'')}</span></div>
+            <div class="pt-field"><span class="pt-label">Work Area</span><span class="pt-value">${escapeHtml(w.area||'')}</span></div>
+          </div>
+        </div>
+      </div>
+      <table class="pt-modules">
+        <thead><tr><th>S.N</th><th>Training Module Name</th><th>Date of Training</th><th>Trainer's Name</th><th>Sign of Trainer</th><th>Sign of Worker</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div></div>`;
+  };
+
+  pa.innerHTML=list.map(cardHTML).join('');
+  pa.style.zoom='1';
+  pa.style.display='block';
+  pa.querySelectorAll('.pt-card-page').forEach(pg=>fitElementToPage(pg,pg.querySelector('tbody')));
+  window.print();
+  setTimeout(()=>{
+    pa.style.display='none';
+    pa.setAttribute('style',originalStyle);
+    pa.innerHTML=originalHTML;
+  },800);
+}
+
+function fitElementToPage(el,tbody){
+  // Makes a printed card fill exactly one A4 page: stretches short cards, shrinks long ones.
+  const maxPx=280*96/25.4; // A4 usable height (297mm - 2*6mm margin) minus safety
+  el.style.zoom='1';
+  tbody.querySelectorAll('td').forEach(td=>{td.style.paddingTop='';td.style.paddingBottom='';});
+  let h=el.scrollHeight;
+  if(h<maxPx){
+    const rows=tbody.querySelectorAll('tr');
+    if(rows.length){
+      const extraPad=Math.max(0,(maxPx-h)/rows.length/2);
+      tbody.querySelectorAll('td').forEach(td=>{td.style.paddingTop=(2.5+extraPad)+'px';td.style.paddingBottom=(2.5+extraPad)+'px';});
+    }
+    h=el.scrollHeight;
+  }
+  if(h>maxPx){
+    let z=1,guard=0;
+    while(h>maxPx&&z>0.4&&guard<20){z=Math.max(0.4,z*(maxPx/h)*0.98);el.style.zoom=z;h=el.scrollHeight;guard++;}
+  }
+}
+function fitPrintAreaToOnePage(){
+  fitElementToPage(document.getElementById('printArea'),document.getElementById('pModules'));
+}
+
+/* ---------------- CLOUD SYNC (Google Sheet + Google Drive via Apps Script) ---------------- */
+const DEFAULT_GAS_URL=''; // paste YOUR Google Apps Script Web App URL here (inside the quotes) to connect a sheet by default; empty = start with a clean, local-only app
+const GAS_KEY='safety_training_cards_gas_url';
+const GAS_SECRET_KEY='safety_training_cards_gas_key';
+const GAS_META_KEY='safety_training_cards_gas_meta';
+const GAS_LAST_SYNC_KEY='safety_training_cards_last_sync';
+function getGasUrl(){try{const v=localStorage.getItem(GAS_KEY);if(v===null)return DEFAULT_GAS_URL;return v==='__none__'?'':v;}catch(e){return DEFAULT_GAS_URL;}}
+function setGasUrl(u){try{localStorage.setItem(GAS_KEY,u||'__none__');}catch(e){}}
+function getGasKey(){try{return localStorage.getItem(GAS_SECRET_KEY)||'';}catch(e){return '';}}
+function setGasKey(k){try{if(k)localStorage.setItem(GAS_SECRET_KEY,k);else localStorage.removeItem(GAS_SECRET_KEY);}catch(e){}}
+function getGasMeta(){try{return JSON.parse(localStorage.getItem(GAS_META_KEY)||'null')||{};}catch(e){return {};}}
+function setGasMeta(m){try{if(m)localStorage.setItem(GAS_META_KEY,JSON.stringify(m));else localStorage.removeItem(GAS_META_KEY);}catch(e){}}
+function getLastSync(){try{return Number(localStorage.getItem(GAS_LAST_SYNC_KEY))||0;}catch(e){return 0;}}
+function markSynced(){try{localStorage.setItem(GAS_LAST_SYNC_KEY,String(Date.now()));}catch(e){}}
+function gasUrl(action){const u=getGasUrl();const k=getGasKey();return u+(u.includes('?')?'&':'?')+'action='+action+(k?'&key='+encodeURIComponent(k):'');}
+function gasFetch(url,opts,ms){
+  const c=new AbortController();const t=setTimeout(()=>c.abort(),ms||30000);
+  return fetch(url,{...(opts||{}),signal:c.signal}).finally(()=>clearTimeout(t));
+}
+function validGasUrl(u){return /^https:\/\/script\.google\.com\/.+\/exec$/.test(u);}
+
+function fmtDate(d){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||'');return m?m[3]+'-'+m[2]+'-'+m[1]:(d||'');}
+function fmtTime(ms){
+  if(!ms)return 'Never';
+  const d=new Date(ms),p=n=>String(n).padStart(2,'0');
+  return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+function updateGasStatus(){
+  const u=getGasUrl();
+  const st=document.getElementById('gasStatus'),stats=document.getElementById('gasStats');
+  const sheetA=document.getElementById('openSheetLink'),folderA=document.getElementById('openFolderLink');
+  const meta=getGasMeta();
+  const okLink=(l,pre)=>typeof l==='string'&&l.startsWith(pre);
+  sheetA.style.display=u&&okLink(meta.sheetUrl,'https://docs.google.com/')?'inline-flex':'none';
+  folderA.style.display=u&&okLink(meta.folderUrl,'https://drive.google.com/')?'inline-flex':'none';
+  if(sheetA.style.display!=='none')sheetA.href=meta.sheetUrl;
+  if(folderA.style.display!=='none')folderA.href=meta.folderUrl;
+  if(!u){
+    st.innerHTML='⚠ <b>Google Sheet / Drive is not connected.</b> Follow the Setup Guide below and save the Web App URL.';
+    stats.innerHTML='';return;
+  }
+  const pending=workers.filter(w=>w.synced!==true).length;
+  st.innerHTML=`✅ <b>Connected</b> &nbsp;<code style="word-break:break-all;font-size:11.5px">${escapeHtml(u)}</code>`;
+  stats.innerHTML=`<div class="sync-stat"><b>${workers.length}</b>Workers in this browser</div>
+    <div class="sync-stat"><b>${pending}</b>Pending upload</div>
+    <div class="sync-stat"><b style="font-size:13px;padding-top:4px">${fmtTime(getLastSync())}</b>Last sync</div>`;
+}
+document.getElementById('gasUrlInput').value=getGasUrl();
+document.getElementById('gasKeyInput').value=getGasKey();
+updateGasStatus();
+
+document.getElementById('saveGasUrlBtn').addEventListener('click',()=>{
+  const v=document.getElementById('gasUrlInput').value.trim();
+  const k=document.getElementById('gasKeyInput').value.trim();
+  if(!v){toast('⚠ Enter the Web App URL (or click Disconnect)');return;}
+  if(!validGasUrl(v)){
+    toast(/\/dev$/.test(v)?'⚠ This is a test (/dev) URL. You need the "/exec" URL created after deploying':'⚠ The URL must look like https://script.google.com/.../exec',4500);return;
+  }
+  requireAdmin(async()=>{
+    const changed=v!==getGasUrl();
+    setGasUrl(v);setGasKey(k);
+    if(changed){workers.forEach(w=>{w.synced=false;});save();setGasMeta(null);} // everything will be re-uploaded to the new Sheet
+    updateGasStatus();
+    const ok=await testGasConnection(false);
+    if(ok)await syncNow(false);
+  },'Enter the admin password to save the cloud URL.');
+});
+document.getElementById('clearGasUrlBtn').addEventListener('click',()=>{
+  requireAdmin(()=>{
+    if(!confirm('Disconnect from Google Sheet/Drive? (Data in this browser will be kept)'))return;
+    setGasUrl('');setGasKey('');setGasMeta(null);
+    document.getElementById('gasUrlInput').value='';document.getElementById('gasKeyInput').value='';
+    updateGasStatus();toast('☁ Disconnected');
+  },'Enter the admin password to disconnect.');
+});
+
+async function testGasConnection(silent){
+  const url=getGasUrl();
+  if(!url){if(!silent)toast('⚠ Save the Web App URL first');return false;}
+  if(!silent)toast('🔌 Testing connection...');
+  try{
+    const res=await gasFetch(gasUrl('ping'),null,20000);
+    const json=await res.json();
+    if(json&&json.status==='success'){
+      setGasMeta({sheetUrl:json.sheetUrl||'',folderUrl:json.folderUrl||'',cloudWorkers:json.workers});
+      updateGasStatus();
+      if(!silent)toast('✅ Connection OK'+(json.workers!=null?' — '+json.workers+' worker(s) in the Sheet':''));
+      return true;
+    }
+    if(!silent)toast('⚠ '+((json&&json.message)||'Unexpected response from Apps Script (check the URL / deployment)'),4500);
+    return false;
+  }catch(err){
+    if(!silent)toast('❌ Connection failed: '+(err.name==='AbortError'?'timeout':err.message)+' — check the URL and "Who has access: Anyone"',5000);
+    return false;
+  }
+}
+document.getElementById('testGasBtn').addEventListener('click',()=>testGasConnection(false));
+
+async function pushWorkerToCloud(data){
+  const url=getGasUrl();
+  if(!url)return false;
+  try{
+    const sendPhoto=!!data.photo&&(!data.photoUrl||!!data.photoDirty);
+    const payload={id:data.id,folder:data.folder,name:data.name,clims:data.clims,grade:data.grade,agency:data.agency,area:data.area,
+      trainings:data.trainings,updatedAt:data.updatedAt,photoUrl:data.photoUrl||'',photo:sendPhoto?data.photo:'',
+      moduleNames:MODULES,key:getGasKey()};
+    const res=await gasFetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight
+      body:JSON.stringify(payload)
+    },90000);
+    const json=await res.json();
+    if(json&&json.status==='success'){
+      const w=workers.find(x=>x.id===data.id);
+      if(w){
+        if(json.driveUrl)w.photoUrl=json.driveUrl;
+        if(w.updatedAt===data.updatedAt){w.synced=true;if(sendPhoto)w.photoDirty=false;}
+        save();
+      }
+      return true;
+    }
+    console.warn('Cloud save failed',json);return false;
+  }catch(err){
+    console.warn('Cloud sync failed',err);return false;
+  }
+}
+
+async function pushModulesToCloud(){
+  const url=getGasUrl();if(!url)return false;
+  try{
+    const res=await gasFetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveModules',modules:MODULES,updatedAt:modulesTs||1,key:getGasKey()})});
+    const json=await res.json();
+    return !!(json&&json.status==='success');
+  }catch(e){return false;}
+}
+
+async function pushAllToCloud(silent){
+  const url=getGasUrl();
+  if(!url){toast('⚠ Save the Web App URL first');return false;}
+  if(workers.length===0){if(!silent)toast('There are no worker records');return true;}
+  toast(`⬆ Uploading ${workers.length} record(s)...`);
+  let fail=0;
+  for(const w of [...workers]){if(!(await pushWorkerToCloud(w)))fail++;}
+  updateGasStatus();
+  if(fail===0){markSynced();updateGasStatus();toast('✅ All records saved to the cloud');}
+  else toast('⚠ '+fail+' record(s) failed to upload — try Sync Now again',4500);
+  return fail===0;
+}
+document.getElementById('pushAllBtn').addEventListener('click',()=>pushAllToCloud(false));
+
+async function syncModulesAndWorkers(){
+  const ok=await pushModulesToCloud();
+  if(!ok){toast('⚠ Modules were not saved to the cloud — click Sync Now later',4500);updateGasStatus();return;}
+  await pushAllToCloud(true);
+}
+
+async function pullFromCloud(silent){
+  const url=getGasUrl();
+  if(!url){if(!silent)toast('⚠ Save the Web App URL first');return false;}
+  try{
+    const res=await gasFetch(gasUrl('list'),null,45000);
+    const json=await res.json();
+    if(!json||json.status!=='success'||!Array.isArray(json.data)){
+      if(!silent)toast('⚠ Sync failed: '+((json&&json.message)||'unexpected response'),4500);
+      return false;
+    }
+    // --- module list (the newest version wins) ---
+    const cloudMods=Array.isArray(json.modules)&&json.modules.length?json.modules:null;
+    const cloudTs=Number(json.modulesUpdatedAt)||0;
+    let modulesChanged=false,pushMods=false;
+    if(cloudMods&&cloudTs>modulesTs){
+      if(JSON.stringify(cloudMods.map(cleanModuleName))!==JSON.stringify(MODULES)){
+        if(document.getElementById('panelNew').classList.contains('active')||(document.getElementById('panelModules').classList.contains('active')&&modDirty())){
+          if(!silent)toast('ℹ Save or close the card / module editor and then Sync (the module list will be updated)',4000);
+          return false;
+        }
+        MODULES=cloudMods.map(cleanModuleName);saveModules(cloudTs);modulesChanged=true;
+      } else {saveModules(cloudTs);if(JSON.stringify(cloudMods)!==JSON.stringify(MODULES))pushMods=true;}
+    } else if(json.modules===null||(cloudMods&&modulesTs>cloudTs)){
+      pushMods=true;
+    }
+    let added=0,updated=0,removed=0;
+    const cloudIds=new Set(json.data.map(cw=>cw.id));
+    const ghosts=[];
+    json.data.forEach(cw=>{
+      if(deletedIds.has(cw.id)){ghosts.push(cw.id);return;} // already deleted locally — will also be removed from the cloud
+      if(!Array.isArray(cw.trainings))cw.trainings=[];
+      const i=workers.findIndex(w=>w.id===cw.id);
+      if(i===-1){cw.synced=true;workers.push(cw);added++;}
+      else{
+        const local=workers[i];
+        if((cw.updatedAt||0)>(local.updatedAt||0)){
+          workers[i]={...cw,photo:(local.photo&&!cw.photo)?local.photo:cw.photo,synced:true,
+            photoUrl:cw.photoUrl||local.photoUrl};
+          updated++;
+        } else if((cw.updatedAt||0)===(local.updatedAt||0)){
+          local.synced=true; // same as the cloud
+        } // local copy is newer -> stays pending, Sync Now will upload it
+      }
+    });
+    // Rows deleted directly from the Sheet are removed locally too, with a safety check:
+    // if many records suddenly "disappear" it is treated as a Sheet mistake and local data is uploaded again.
+    const gone=workers.filter(w=>w.synced===true&&!cloudIds.has(w.id)&&cloudIds.size>0);
+    const syncedCount=workers.filter(w=>w.synced===true).length;
+    if(gone.length>3&&gone.length>=syncedCount*0.5){
+      gone.forEach(w=>{w.synced=false;});
+      if(!silent)toast('⚠ Many records are missing in the Sheet — local data was kept and will be uploaded again',5000);
+    } else if(gone.length){
+      const goneIds=new Set(gone.map(w=>w.id));
+      goneIds.forEach(id=>deletedIds.add(id));
+      workers=workers.filter(w=>!goneIds.has(w.id));
+      removed=gone.length;saveDeleted(deletedIds);
+    }
+    normalizeTrainings();syncFolders();
+    if(modulesChanged){populateAdvModule();resetForm();if(document.getElementById('panelModules').classList.contains('active'))startModuleManager();}
+    save();renderTable();renderDashboard();
+    if(pushMods)await pushModulesToCloud();
+    for(const id of ghosts)await deleteWorkerFromCloud(id);
+    markSynced();updateGasStatus();
+    if(!silent)toast(`☁ Synced: ${added} added, ${updated} updated${removed?', '+removed+' removed':''}${modulesChanged?', modules updated':''}`);
+    return true;
+  }catch(err){
+    if(!silent)toast('⚠ Sync error: '+(err.name==='AbortError'?'timeout':err.message),4500);
+    return false;
+  }
+}
+document.getElementById('pullNowBtn').addEventListener('click',()=>pullFromCloud(false));
+
+let syncing=false;
+async function syncNow(silent){
+  if(!getGasUrl()){if(!silent)toast('⚠ Save the Web App URL first');return false;}
+  if(syncing){return false;}
+  syncing=true;
+  const btn=document.getElementById('syncNowBtn');btn.disabled=true;
+  try{
+    const okPull=await pullFromCloud(true);
+    if(!okPull){if(!silent)toast('⚠ Could not connect to the cloud — check your internet / URL',4500);return false;}
+    const pend=workers.filter(w=>w.synced!==true);
+    let fail=0;
+    for(const w of pend){if(!(await pushWorkerToCloud(w)))fail++;}
+    if(fail===0){markSynced();if(!silent)toast(pend.length?`✅ Sync complete — ${pend.length} record(s) uploaded`:'✅ Everything is up to date');}
+    else if(!silent)toast('⚠ '+fail+' record(s) failed to upload — try again shortly',4500);
+    return fail===0;
+  }finally{syncing=false;btn.disabled=false;updateGasStatus();}
+}
+document.getElementById('syncNowBtn').addEventListener('click',()=>syncNow(false));
+window.addEventListener('online',()=>syncNow(true));
+setInterval(()=>{if(getGasUrl()&&!document.hidden)syncNow(true);},180000);
+
+document.getElementById('copyCodeBtn').addEventListener('click',async()=>{
+  const ta=document.getElementById('gsCode');
+  try{await navigator.clipboard.writeText(ta.value);toast('📋 Code copied');}
+  catch(e){ta.removeAttribute('readonly');ta.select();try{document.execCommand('copy');toast('📋 Code copied');}catch(x){toast('Select the code and press Ctrl+C');}ta.setAttribute('readonly','');}
+});
+document.getElementById('downloadCodeBtn').addEventListener('click',()=>{
+  const blob=new Blob([document.getElementById('gsCode').value],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Code.gs';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+
+/* ---------------- ADMIN LOGIN ---------------- */
+// NOTE: client-side check only — it stops accidental deletes, it is not real security.
+const ADMIN_PASSWORD='5258';
+const ADMIN_KEY='stc_admin_session';
+let isAdmin=false;try{isAdmin=sessionStorage.getItem(ADMIN_KEY)==='1';}catch(e){}
+let adminPending=null,adminFails=0,adminLockUntil=0;
+function updateAdminUI(){
+  const b=document.getElementById('adminBtn');
+  b.textContent=isAdmin?'🔓 Admin (Logout)':'🔒 Admin Login';
+  b.classList.toggle('on',isAdmin);
+  refreshLocks();
+}
+function openAdminModal(msg){
+  document.getElementById('adminModalMsg').textContent=msg||'Enter the admin password to delete data.';
+  document.getElementById('adminPass').value='';
+  document.getElementById('adminErr').textContent='';
+  document.getElementById('adminModal').style.display='flex';
+  setTimeout(()=>document.getElementById('adminPass').focus(),30);
+}
+function closeAdminModal(){document.getElementById('adminModal').style.display='none';adminPending=null;}
+function requireAdmin(cb,msg){
+  if(isAdmin){cb();return;}
+  adminPending=cb;openAdminModal(msg);
+}
+function submitAdminLogin(){
+  const err=document.getElementById('adminErr');
+  const now=Date.now();
+  if(now<adminLockUntil){err.textContent='Too many wrong attempts. '+Math.ceil((adminLockUntil-now)/1000)+' seconds.';return;}
+  const val=document.getElementById('adminPass').value;
+  if(val===ADMIN_PASSWORD){
+    isAdmin=true;try{sessionStorage.setItem(ADMIN_KEY,'1');}catch(e){}
+    adminFails=0;
+    const cb=adminPending;adminPending=null;
+    document.getElementById('adminModal').style.display='none';
+    updateAdminUI();toast('🔓 Admin login successful');
+    if(cb)cb();
+  }else{
+    adminFails++;
+    if(adminFails>=5){adminLockUntil=Date.now()+30000;adminFails=0;err.textContent='5 wrong attempts. Locked for 30 seconds.';}
+    else err.textContent='❌ Wrong password ('+adminFails+'/5)';
+    document.getElementById('adminPass').value='';document.getElementById('adminPass').focus();
+  }
+}
+document.getElementById('adminLoginBtn').addEventListener('click',submitAdminLogin);
+document.getElementById('adminCancelBtn').addEventListener('click',closeAdminModal);
+document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')submitAdminLogin();if(e.key==='Escape')closeAdminModal();});
+document.getElementById('adminModal').addEventListener('click',e=>{if(e.target.id==='adminModal')closeAdminModal();});
+document.getElementById('adminBtn').addEventListener('click',()=>{
+  if(isAdmin){isAdmin=false;try{sessionStorage.removeItem(ADMIN_KEY);}catch(e){}updateAdminUI();toast('🔒 Admin logged out');}
+  else requireAdmin(()=>{},'Enter the admin password.');
+});
+
+/* ---------------- MANAGE MODULES ---------------- */
+let modDraft=[];
+function modDirty(){return modDraft.length!==MODULES.length||modDraft.some((m,i)=>m.orig!==i||m.name.trim()!==MODULES[i]);}
+function startModuleManager(){
+  modDraft=MODULES.map((name,i)=>({name,orig:i}));
+  renderModuleManager();
+}
+function renderModuleManager(){
+  const tb=document.getElementById('modMgrBody');tb.innerHTML='';
+  modDraft.forEach((m,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td>
+      <td><input type="text" class="modName" data-i="${i}" value="${escapeHtml(m.name)}" placeholder="Module name">${m.orig==null?' <span class="badge badge-partial">New</span>':''}</td>
+      <td style="text-align:center">${m.orig==null?'—':workers.filter(w=>{const t=w.trainings[m.orig];return t&&(t.date||t.trainer||t.trainerSign||t.workerSign);}).length+' / '+workers.length}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-outline btn-sm" data-act="up" data-i="${i}" ${i===0?'disabled':''}>↑</button>
+        <button class="btn btn-outline btn-sm" data-act="down" data-i="${i}" ${i===modDraft.length-1?'disabled':''}>↓</button>
+        <button class="btn btn-danger btn-sm" data-act="del" data-i="${i}">🗑 Delete</button>
+      </div></td>`;
+    tb.appendChild(tr);
+  });
+  const removed=MODULES.length-modDraft.filter(m=>m.orig!=null).length;
+  document.getElementById('modMgrInfo').textContent='Total modules: '+modDraft.length+(removed>0?' • Delete marked: '+removed:'')+' • Saving applies to all '+workers.length+' worker card(s)';
+}
+document.getElementById('modMgrBody').addEventListener('input',e=>{
+  const el=e.target.closest('.modName');if(!el)return;
+  modDraft[+el.dataset.i].name=el.value;
+});
+document.getElementById('modMgrBody').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]');if(!b||b.disabled)return;
+  const i=+b.dataset.i,act=b.dataset.act;
+  if(act==='up'&&i>0){[modDraft[i-1],modDraft[i]]=[modDraft[i],modDraft[i-1]];}
+  else if(act==='down'&&i<modDraft.length-1){[modDraft[i+1],modDraft[i]]=[modDraft[i],modDraft[i+1]];}
+  else if(act==='del'){
+    if(modDraft.length<=1){toast('⚠ At least 1 module is required');return;}
+    modDraft.splice(i,1);
+  }
+  renderModuleManager();
+});
+document.getElementById('modAddBtn').addEventListener('click',()=>{
+  modDraft.push({name:'',orig:null});renderModuleManager();
+  const inputs=document.querySelectorAll('#modMgrBody .modName');inputs[inputs.length-1].focus();
+});
+document.getElementById('modDiscardBtn').addEventListener('click',()=>{startModuleManager();toast('↩ Changes discarded');});
+document.getElementById('modDefaultBtn').addEventListener('click',()=>{
+  if(!confirm('Restore the default list of 25 modules? (It loads as a draft and is applied when you click Save Changes)'))return;
+  modDraft=DEFAULT_MODULES.map(name=>({name,orig:null}));
+  // keep data for same-named existing modules
+  modDraft.forEach(d=>{const j=MODULES.indexOf(d.name);if(j!==-1)d.orig=j;});
+  renderModuleManager();
+});
+function applyModules(){
+  const names=modDraft.map(m=>m.name.trim());
+  if(names.some(n=>!n)){toast('⚠ Module name cannot be empty');return;}
+  const lowered=names.map(n=>n.toLowerCase());
+  if(new Set(lowered).size!==lowered.length){const dup=names.find((n,i)=>lowered.indexOf(n.toLowerCase())!==i);toast('⚠ Duplicate module name: "'+dup+'" — make each name different',4500);return;}
+  const keptOrig=new Set(modDraft.filter(m=>m.orig!=null).map(m=>m.orig));
+  const removedIdx=MODULES.map((_,i)=>i).filter(i=>!keptOrig.has(i));
+  const lost=workers.reduce((n,w)=>n+removedIdx.filter(i=>{const t=w.trainings[i];return t&&(t.date||t.trainer||t.trainerSign||t.workerSign);}).length,0);
+  const go=()=>{
+    let msg='Save modules?';
+    if(removedIdx.length){
+      msg=removedIdx.length+' module(s) will be deleted:\n• '+removedIdx.map(i=>MODULES[i].trim()).join('\n• ')+'\n\n'+
+          (lost?lost+' training record(s) will be removed from the workers\' cards.\n\n':'')+'Continue?';
+    }
+    if(!confirm(msg))return;
+    const blank=()=>({date:'',trainer:'',trainerSign:false,workerSign:false});
+    const now=Date.now();
+    workers.forEach(w=>{
+      w.trainings=modDraft.map(m=>m.orig!=null&&w.trainings[m.orig]?w.trainings[m.orig]:blank());
+      w.updatedAt=now;w.synced=false;
+    });
+    MODULES=names;saveModules();save();
+    populateAdvModule();resetForm();renderTable();renderDashboard();
+    startModuleManager();
+    toast('✅ Modules updated');
+    if(getGasUrl())syncModulesAndWorkers();
+  };
+  if(removedIdx.length)requireAdmin(go,'Enter the admin password to delete modules.');
+  else go();
+}
+document.getElementById('modSaveBtn').addEventListener('click',applyModules);
+
+/* ---------------- ADD / REMOVE MODULE FROM CARD SCREEN (staged: applied ONLY when Save / Update Card is clicked) ---------------- */
+let cardDraft=[],viewPending=false,modulesNeedPush=false;
+function freshDraft(){cardDraft=MODULES.map((name,i)=>({name,orig:i}));}
+function draftChanged(){return cardDraft.length!==MODULES.length||cardDraft.some((m,i)=>m.orig!==i||m.name!==MODULES[i]);}
+function markPendingChange(){
+  if(formViewMode){viewPending=true;const sb=document.getElementById('saveWorkerBtn');sb.style.display='inline-block';sb.textContent='💾 Update Card';}
+}
+function stageModuleChange(mutate){
+  const formT=collectTrainings(),ro=formViewMode;
+  mutate(cardDraft,formT);
+  buildModuleRows(formT);
+  setFormReadOnly(ro);
+  markPendingChange();
+}
+function commitCardModules(next){
+  const kept=new Set(cardDraft.filter(m=>m.orig!=null).map(m=>m.orig));
+  const removedIdx=MODULES.map((_,i)=>i).filter(i=>!kept.has(i));
+  const go=()=>{
+    if(removedIdx.length){
+      const lost=workers.filter(w=>removedIdx.some(i=>{const t=w.trainings[i];return t&&(t.date||t.trainer||t.trainerSign||t.workerSign);})).length;
+      if(!confirm('These module(s) will be deleted for ALL workers:\n• '+removedIdx.map(i=>MODULES[i].trim()).join('\n• ')+'\n\n'+(lost?lost+' worker(s) have training data in them - it will be removed.\n\n':'')+'Continue?'))return;
+    }
+    const names=cardDraft.map(m=>m.name),blank=()=>({date:'',trainer:'',trainerSign:false,workerSign:false}),now=Date.now();
+    workers.forEach(w=>{w.trainings=cardDraft.map(m=>m.orig!=null&&w.trainings[m.orig]?w.trainings[m.orig]:blank());w.updatedAt=now;w.synced=false;});
+    MODULES=names;saveModules();
+    freshDraft();modulesNeedPush=true;
+    populateAdvModule();
+    next();
+  };
+  if(removedIdx.length)requireAdmin(go,'Enter the admin password to save the module deletion.');else go();
+}
+document.getElementById('moduleTableBody').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act="removeModule"]');if(!b)return;
+  const idx=+b.closest('tr').dataset.i;
+  if(cardDraft.length<=1){toast('⚠ At least 1 module is required');return;}
+  requireAdmin(()=>{
+    const m=cardDraft[idx];if(!m)return;
+    if(!confirm('Remove module "'+m.name.trim()+'" from the list?\n\nNothing is deleted until you click Save / Update Card.'))return;
+    stageModuleChange((d,t)=>{d.splice(idx,1);t.splice(idx,1);});
+    toast('✖ Module marked for removal — click Save / Update Card to apply');
+  },'Enter the admin password to remove this module.');
+});
+document.getElementById('moduleTableBody').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act="editModule"]');if(!b)return;
+  const idx=+b.closest('tr').dataset.i;
+  requireAdmin(()=>{
+    const m=cardDraft[idx];if(!m)return;
+    const nn=prompt('Edit module name (applies to ALL workers after Save):',m.name);
+    if(nn===null)return;
+    const name=nn.trim();
+    if(!name){toast('⚠ Module name cannot be empty');return;}
+    if(cardDraft.some((x,i)=>i!==idx&&x.name.trim().toLowerCase()===name.toLowerCase())){toast('⚠ This module already exists');return;}
+    if(name===m.name)return;
+    stageModuleChange(d=>{d[idx].name=name;});
+    toast('✎ Module edited — click Save / Update Card to apply');
+  },'Enter the admin password to edit this module.');
+});
+document.getElementById('addModuleFromCardBtn').addEventListener('click',()=>{
+  const name=(prompt('Enter the new training module name:')||'').trim();
+  if(!name)return;
+  if(cardDraft.some(m=>m.name.trim().toLowerCase()===name.toLowerCase())){toast('⚠ This module already exists');return;}
+  stageModuleChange((d,t)=>{d.push({name,orig:null});t.push({date:'',trainer:'',trainerSign:false,workerSign:false});});
+  toast('➕ Module added — click Save / Update Card to apply');
+  const tb=document.getElementById('moduleTableBody');if(tb.lastElementChild)tb.lastElementChild.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+
+/* ---------------- FOLDERS: NEW / DELETE ---------------- */
+function addFolder(){
+  requireAdmin(()=>{
+    const name=(prompt('New folder name:')||'').trim();
+    if(!name)return;
+    if(FOLDERS.some(f=>f.trim().toLowerCase()===name.toLowerCase())){toast('⚠ This folder already exists');return;}
+    FOLDERS.push(name);saveFolders();rebuildFolderSelects();renderDashboard();toast('📁 Folder created: '+name);
+  },'Enter the admin password to create a folder.');
+}
+function deleteFolder(f){
+  requireAdmin(()=>{
+    if(FOLDERS.length<=1){toast('⚠ At least 1 folder is required');return;}
+    const n=workers.filter(w=>(w.folder||FOLDERS[0])===f).length;
+    if(n){toast('⚠ "'+f+'" has '+n+' worker(s). Delete or move them to another folder first.',4500);return;}
+    if(!confirm('Delete folder "'+f+'"?'))return;
+    const i=FOLDERS.indexOf(f);if(i>-1)FOLDERS.splice(i,1);
+    if(activeFolder===f)activeFolder='';
+    saveFolders();rebuildFolderSelects();renderDashboard();renderTable();toast('🗑 Folder deleted: '+f);
+  },'Enter the admin password to delete the folder "'+f+'".');
+}
+document.getElementById('addFolderBtn').addEventListener('click',addFolder);
+
+/* ---------------- MODERN UI: dark mode, count-up ---------------- */
+function countUp(root){root.querySelectorAll('.stat b').forEach(b=>{const t=b.textContent.trim(),n=parseInt(t);if(!(n>0)||String(n)!==t)return;const t0=performance.now();(function f(now){const k=Math.min(1,(now-t0)/600);b.textContent=k<1?Math.round(n*k):n;if(k<1)requestAnimationFrame(f);})(t0);});}
+const _rd=renderDashboard;renderDashboard=function(){_rd.apply(this,arguments);countUp(document.getElementById('dashStats'));};
+
+populateAdvModule();updateAdminUI();
+load();syncFolders();freshDraft();buildModuleRows(blankTrainings());renderTable();renderDashboard();
+if(getGasUrl()){ // page shows local data instantly; cloud sync runs in the background after first paint
+  const es=document.getElementById('emptyState'),emptyTxt=es?es.textContent:'';
+  if(!workers.length&&es)es.textContent='⏳ Loading data...';
+  setTimeout(async()=>{
+    try{await syncNow(true);}catch(e){}
+    if(es&&!workers.length)es.textContent=emptyTxt;
+    renderTable();renderDashboard();
+    testGasConnection(true);
+  },250);
+}
+</script>
+</body>
+</html>
